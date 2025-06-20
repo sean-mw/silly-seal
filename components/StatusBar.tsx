@@ -28,7 +28,9 @@ function StatusBar({ title, percent, buttonLabel, onClick }: StatusBarProps) {
             }}
           />
         </div>
-        <Button onClick={onClick}>{buttonLabel}</Button>
+        <Button className="w-24 h-10" onClick={onClick}>
+          {buttonLabel}
+        </Button>
       </div>
     </div>
   );
