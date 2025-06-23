@@ -187,12 +187,18 @@ export default function Play() {
             key={fish}
             onClick={() => addFishToGuess(fish)}
             disabled={gameOver}
-            className={`w-16 h-16 border-3 rounded flex items-center justify-center ${
+            className={`w-16 h-16 border-3 rounded flex items-center justify-center select-none ${
               keyboardColors[fish] ?? "bg-white"
             }`}
             style={{ imageRendering: "pixelated" }}
           >
-            <Image src={`/${fish}.png`} alt={fish} width={48} height={48} />
+            <Image
+              src={`/${fish}.png`}
+              alt={fish}
+              width={48}
+              height={48}
+              draggable={false}
+            />
           </button>
         ))}
       </div>
@@ -201,7 +207,7 @@ export default function Play() {
         <button
           onClick={submitGuess}
           className={
-            "w-16 h-16 border-3 rounded flex items-center justify-center font-bold"
+            "w-16 h-16 border-3 rounded flex items-center justify-center font-bold select-none"
           }
         >
           FEED
