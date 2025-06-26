@@ -232,7 +232,7 @@ export default function Play() {
 
       {gameOver && (
         <div className="text-lg font-semibold text-center">
-          {victory ? "✅ The seal is happy!" : "❌ The seal is still hungry!"}
+          {victory ? "The seal is happy!" : "The seal is still hungry!"}
         </div>
       )}
     </div>

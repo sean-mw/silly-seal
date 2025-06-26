@@ -1,46 +1,49 @@
 import { neon } from "@neondatabase/serverless";
 import * as dotenv from "dotenv";
+import * as fs from "fs/promises";
+import * as path from "path";
 
 dotenv.config({ path: ".env.development.local" });
 
 const sql = neon(process.env.DATABASE_URL!);
 
-type Creature = {
-  scientific_name: string;
-  average_depth: number;
+type SpeciesRecord = {
+  scientificName: string;
+  commonName: string;
+  averageDepth: number;
+  occurrenceCount: number;
 };
-
-const data: Creature[] = [
-  { scientific_name: "Melanocetus johnsonii", average_depth: 1500 }, // Anglerfish
-  { scientific_name: "Architeuthis dux", average_depth: 1000 }, // Giant Squid
-  { scientific_name: "Holothuria edulis", average_depth: 400 }, // Sea Cucumber
-  { scientific_name: "Grimpoteuthis spp.", average_depth: 3000 }, // Dumbo Octopus
-  { scientific_name: "Psychrolutes marcidus", average_depth: 1000 }, // Blobfish
-  { scientific_name: "Myctophum punctatum", average_depth: 500 }, // Lanternfish
-  { scientific_name: "Vampyroteuthis infernalis", average_depth: 800 }, // Vampire Squid
-  { scientific_name: "Argyropelecus gigas", average_depth: 1200 }, // Hatchetfish
-  { scientific_name: "Chlamydoselachus anguineus", average_depth: 1500 }, // Frilled Shark
-];
 
 async function seed() {
   try {
+    const speciesListPath = path.resolve("data", "speciesList.json");
+    const raw = await fs.readFile(speciesListPath, "utf-8");
+    const data: SpeciesRecord[] = JSON.parse(raw);
+
     await sql`
-      CREATE TABLE IF NOT EXISTS creatures (
+      CREATE TABLE IF NOT EXISTS species (
         id SERIAL PRIMARY KEY,
         scientific_name TEXT UNIQUE NOT NULL,
-        average_depth INTEGER NOT NULL
+        common_name TEXT,
+        average_depth INTEGER NOT NULL,
+        occurrence_count INTEGER
       );
     `;
 
-    for (const creature of data) {
+    for (const species of data) {
       await sql`
-        INSERT INTO creatures (scientific_name, average_depth)
-        VALUES (${creature.scientific_name}, ${creature.average_depth})
+        INSERT INTO species (scientific_name, common_name, average_depth, occurrence_count)
+        VALUES (
+          ${species.scientificName},
+          ${species.commonName},
+          ${Math.round(species.averageDepth)},
+          ${species.occurrenceCount}
+        )
         ON CONFLICT (scientific_name) DO NOTHING;
       `;
     }
 
-    console.log("Seeded database successfully");
+    console.log(`Seeded ${data.length} species to the database successfully.`);
   } catch (error) {
     console.error("Error seeding database:", error);
   }

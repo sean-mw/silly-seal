@@ -89,9 +89,7 @@ export default function Clean() {
       </div>
       {(gameOver || victory) && (
         <div className="text-lg font-semibold text-center">
-          {victory
-            ? "✅ Cleanup complete!"
-            : "❌ You broke the cleaning machine!"}
+          {victory ? "Cleanup complete!" : "You broke the cleaning machine!"}
         </div>
       )}
       <Button onClick={resetGame}>Restart</Button>

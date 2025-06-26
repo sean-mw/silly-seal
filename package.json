@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "ts-node scripts/seed.ts"
+    "seed": "tsc -p tsconfig.scripts.json && node dist-scripts/seed.js",
+    "updateScientificNameMap": "tsc -p tsconfig.scripts.json && node dist-scripts/updateScientificNameMap.js",
+    "updateSpeciesList": "tsc -p tsconfig.scripts.json && node dist-scripts/updateSpeciesList.js"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",
@@ -27,6 +29,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
+    "hyparquet": "^1.8.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
