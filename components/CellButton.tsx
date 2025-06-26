@@ -16,7 +16,7 @@ function CellButton({
 
   return (
     <button
-      className="w-8 h-8 bg-cover relative"
+      className="w-8 h-8 bg-cover relative select-none"
       style={{ backgroundImage: background, imageRendering: "pixelated" }}
       onClick={onLeftClick}
       onContextMenu={onRightClick}
@@ -33,6 +33,7 @@ function CellButton({
           width={8}
           height={8}
           className="w-full h-full"
+          draggable={false}
         />
       )}
       {gameOver && cell.hasRock && (
@@ -42,6 +43,7 @@ function CellButton({
           width={8}
           height={8}
           className="w-full h-full"
+          draggable={false}
         />
       )}
     </button>
