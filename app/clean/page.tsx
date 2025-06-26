@@ -35,7 +35,11 @@ export default function Clean() {
     checkVictory(newGrid);
   };
 
-  const handleRightClick = (e: React.MouseEvent, x: number, y: number) => {
+  const handleRightClick = (
+    e: React.MouseEvent | React.TouchEvent,
+    x: number,
+    y: number
+  ) => {
     e.preventDefault();
     if (gameOver || victory) return;
     const newGrid = grid.map((row) => row.map((cell) => ({ ...cell })));
