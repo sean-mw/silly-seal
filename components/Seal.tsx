@@ -1,15 +1,24 @@
 import Image from "next/image";
 
-function Seal() {
+type SealProps = {
+  size: number;
+};
+
+export default function Seal({ size }: SealProps) {
   return (
-    <Image
-      src="/seal.png"
-      alt="Pixelated seal"
-      style={{ width: "100%", height: "auto" }}
-      width={1024}
-      height={1024}
-    />
+    <div
+      className="relative border-3 border-black rounded overflow-hidden"
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+      }}
+    >
+      <Image
+        src="/seal.png"
+        alt="Pixelated seal"
+        fill
+        className="object-cover"
+      />
+    </div>
   );
 }
-
-export default Seal;
