@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/Button";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 
 type Species = {
@@ -8,6 +9,7 @@ type Species = {
   common_name: string;
   average_depth: number;
   occurrence_count: number;
+  image_urls: string[];
 };
 
 function getRandomIndex(max: number, excludeIndex?: number): number {
@@ -104,11 +106,21 @@ export default function Play() {
   }) => {
     const species = speciesList[idx];
     return (
-      <div className="py-4 border-3 rounded w-full h-full">
-        <div className="text-lg font-bold">{species.common_name}</div>
-        <div className="text-gray-700 text-sm">({species.scientific_name})</div>
+      <div className="flex flex-col py-4 border-3 rounded w-full h-full items-center gap-1">
+        <div>
+          <div className="text-lg font-bold">{species.common_name}</div>
+          <div className="text-gray-700 text-sm">
+            ({species.scientific_name})
+          </div>
+        </div>
+        <Image
+          src={species.image_urls[0]}
+          alt={species.common_name}
+          width={400}
+          height={400}
+        />
         {showDepth !== false ? (
-          <div className="pt-2 w-full">
+          <div>
             <div>Lives at ~{species.average_depth}m*</div>
             <div className="text-gray-700 text-sm">
               *Calculated from {species.occurrence_count} observations

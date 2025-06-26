@@ -9,7 +9,8 @@ export async function GET() {
         scientific_name,
         common_name,
         average_depth,
-        occurrence_count
+        occurrence_count,
+        image_urls
       FROM species
       ORDER BY RANDOM()
       LIMIT 100;

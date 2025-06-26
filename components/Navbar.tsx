@@ -12,7 +12,7 @@ export default function Navbar() {
   return (
     <>
       {!isRoot && (
-        <div className="p-8">
+        <div className="p-4">
           <Button onClick={() => router.back()}>←</Button>
         </div>
       )}
