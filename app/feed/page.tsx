@@ -13,6 +13,7 @@ const FISH_TYPES = [
 ];
 const SEQUENCE_LENGTH = 4;
 const MAX_ATTEMPTS = 6;
+const CELL_SIZE = "w-[min(12vw,12vh,64px)] h-[min(12vw,12vh,64px)]";
 
 type FeedbackType = "correct" | "misplaced" | "wrong";
 
@@ -138,12 +139,7 @@ export default function Play() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <h1 className="text-2xl font-bold">Feed the Seal!</h1>
-      <p className="text-lg">
-        Guess the sequence of fish the seal wants to eat today.
-      </p>
-
+    <div className="flex flex-col w-full h-full items-center justify-center gap-4">
       <div className="flex flex-col gap-2">
         {Array.from({ length: MAX_ATTEMPTS }).map((_, rowIdx) => {
           const isCurrent = rowIdx === guesses.length && !gameOver;
@@ -162,8 +158,10 @@ export default function Play() {
                 return (
                   <div
                     key={colIdx}
-                    className={`w-16 h-16 border-3 rounded flex items-center justify-center ${colorClass}`}
-                    style={{ imageRendering: "pixelated" }}
+                    className={`${CELL_SIZE} border-3 rounded flex items-center justify-center ${colorClass}`}
+                    style={{
+                      imageRendering: "pixelated",
+                    }}
                   >
                     {fish && (
                       <Image
@@ -171,6 +169,7 @@ export default function Play() {
                         alt={fish}
                         width={48}
                         height={48}
+                        className="w-3/4 h-3/4"
                       />
                     )}
                   </div>
@@ -187,7 +186,7 @@ export default function Play() {
             key={fish}
             onClick={() => addFishToGuess(fish)}
             disabled={gameOver}
-            className={`w-16 h-16 border-3 rounded flex items-center justify-center select-none ${
+            className={`${CELL_SIZE} border-3 rounded flex items-center justify-center select-none ${
               keyboardColors[fish] ?? "bg-white"
             }`}
             style={{ imageRendering: "pixelated" }}
@@ -198,6 +197,7 @@ export default function Play() {
               width={48}
               height={48}
               draggable={false}
+              className="w-3/4 h-3/4"
             />
           </button>
         ))}
@@ -206,27 +206,21 @@ export default function Play() {
       <div className="flex gap-2">
         <button
           onClick={submitGuess}
-          className={
-            "w-16 h-16 border-3 rounded flex items-center justify-center font-bold select-none"
-          }
+          className={`${CELL_SIZE} border-3 rounded flex items-center justify-center font-bold select-none text-sm`}
         >
           FEED
         </button>
         <button
           onClick={resetGame}
-          className={
-            "w-16 h-16 border-3 rounded flex items-center justify-center"
-          }
+          className={`${CELL_SIZE} border-3 rounded flex items-center justify-center`}
         >
-          <RotateCcw width={48} height={48} />
+          <RotateCcw width={48} height={48} className="w-3/4 h-3/4" />
         </button>
         <button
           onClick={removeLastFish}
-          className={
-            "w-16 h-16 border-3 rounded flex items-center justify-center"
-          }
+          className={`${CELL_SIZE} border-3 rounded flex items-center justify-center`}
         >
-          <Delete width={48} height={48} />
+          <Delete width={48} height={48} className="w-3/4 h-3/4" />
         </button>
       </div>
 

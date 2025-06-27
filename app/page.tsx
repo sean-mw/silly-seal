@@ -39,13 +39,13 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col max-h-screen gap-4">
+    <div className="flex flex-col h-full w-full max-h-screen items-center justify-center gap-4">
       <div className="flex justify-center">
         <Seal size={sealSize} />
       </div>
       <div
         ref={statusContainerRef}
-        className="flex flex-col border-b-3 border-x-3 border-black rounded"
+        className="flex flex-col w-full border-b-3 border-x-3 border-black rounded"
       >
         <StatusBar
           title={"Hunger"}
