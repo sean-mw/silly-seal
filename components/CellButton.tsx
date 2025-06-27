@@ -55,7 +55,7 @@ function CellButton({
           alt="Flag"
           width={16}
           height={16}
-          className="w-full h-full"
+          className="w-full h-full pointer-events-none"
           draggable={false}
         />
       )}
@@ -65,7 +65,7 @@ function CellButton({
           alt="Rock"
           width={16}
           height={16}
-          className="w-full h-full"
+          className="w-full h-full pointer-events-none"
           draggable={false}
         />
       )}
