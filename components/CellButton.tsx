@@ -2,6 +2,8 @@ import { Cell } from "@/lib/minesweeper";
 import Image from "next/image";
 import { useRef } from "react";
 
+const CELL_SIZE = "w-[min(10vw,10vh,64px)] h-[min(10vw,10vh,64px)]";
+
 function CellButton({
   cell,
   onLeftClick,
@@ -34,7 +36,7 @@ function CellButton({
 
   return (
     <button
-      className="w-8 h-8 bg-cover relative select-none touch-none"
+      className={`${CELL_SIZE} bg-cover relative select-none touch-none`}
       style={{ backgroundImage: background, imageRendering: "pixelated" }}
       onClick={onLeftClick}
       onContextMenu={onRightClick}
@@ -51,8 +53,8 @@ function CellButton({
         <Image
           src="/flag.png"
           alt="Flag"
-          width={8}
-          height={8}
+          width={16}
+          height={16}
           className="w-full h-full"
           draggable={false}
         />
@@ -61,8 +63,8 @@ function CellButton({
         <Image
           src="/rock.png"
           alt="Rock"
-          width={8}
-          height={8}
+          width={16}
+          height={16}
           className="w-full h-full"
           draggable={false}
         />

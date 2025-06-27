@@ -68,16 +68,13 @@ export default function Clean() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <h1 className="text-2xl font-bold">Clean the Seal Enclosure.</h1>
-      <p className="text-lg">
-        Left-click to clean water tiles. Right-click to flag tiles with
-        suspected rocks. Don&apos;t click on the rocks or you&apos;ll break the
-        cleaning machine!
-      </p>
+    <div className="flex flex-col h-full items-center justify-center gap-4">
       <div
         className="grid border-3 rounded"
-        style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, 2rem)` }}
+        style={{
+          gridTemplateColumns: `repeat(${GRID_SIZE}, min(10vw, 10vh, 64px))`,
+          gridTemplateRows: `repeat(${GRID_SIZE}, min(10vw, 10vh, 64px))`,
+        }}
       >
         {grid.map((row, y) =>
           row.map((cell, x) => (
