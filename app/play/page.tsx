@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/Button";
+import { useSeal } from "@/hooks/useSeal";
 import { useState, useEffect } from "react";
 
 type Species = {
@@ -26,6 +27,7 @@ export default function Play() {
   const [currentIdx, setCurrentIdx] = useState<number | null>(null);
   const [nextIdx, setNextIdx] = useState<number | null>(null);
   const [showNextDepth, setShowNextDepth] = useState(false);
+  const { seal, setSeal } = useSeal();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,6 +79,10 @@ export default function Play() {
         setShowNextDepth(false);
       } else {
         setGameOver(true);
+        setSeal({
+          ...seal,
+          happiness: seal.happiness + score * 3,
+        });
       }
     }, 1500);
   };

@@ -2,6 +2,7 @@
 
 import Seal from "@/components/Seal";
 import StatusBar from "@/components/StatusBar";
+import { useSeal } from "@/hooks/useSeal";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -9,6 +10,7 @@ export default function Home() {
   const router = useRouter();
   const statusContainerRef = useRef<HTMLDivElement>(null);
   const [sealSize, setSealSize] = useState(512);
+  const { seal } = useSeal();
 
   useEffect(() => {
     const updateSealSize = () => {
@@ -49,15 +51,15 @@ export default function Home() {
       >
         <StatusBar
           title={"Hunger"}
-          percent={0.5}
+          percent={seal.hunger / 100}
           buttonLabel={"Feed"}
           onClick={() => {
             router.push("/feed");
           }}
         />
         <StatusBar
-          title={"Stimulation"}
-          percent={0.8}
+          title={"Happiness"}
+          percent={seal.happiness / 100}
           buttonLabel={"Play"}
           onClick={() => {
             router.push("/play");
@@ -65,7 +67,7 @@ export default function Home() {
         />
         <StatusBar
           title={"Hygiene"}
-          percent={0.2}
+          percent={seal.hygiene / 100}
           buttonLabel={"Clean"}
           onClick={() => {
             router.push("/clean");

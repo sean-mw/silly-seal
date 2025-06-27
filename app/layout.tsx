@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import { SealProvider } from "@/hooks/useSeal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +33,9 @@ export default function RootLayout({
           <Navbar />
         </div>
         <div className="flex justify-center items-center w-full h-full">
-          <div className="max-w-lg h-full w-full">{children}</div>
+          <SealProvider>
+            <div className="max-w-lg h-full w-full">{children}</div>
+          </SealProvider>
         </div>
       </body>
     </html>

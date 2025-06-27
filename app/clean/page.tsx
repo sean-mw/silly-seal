@@ -9,11 +9,13 @@ import {
   revealEmptyCells,
 } from "@/lib/minesweeper";
 import CellButton from "@/components/CellButton";
+import { MAX_STAT_VALUE, useSeal } from "@/hooks/useSeal";
 
 export default function Clean() {
   const [grid, setGrid] = useState<Cell[][]>([]);
   const [gameOver, setGameOver] = useState(false);
   const [victory, setVictory] = useState(false);
+  const { seal, setSeal } = useSeal();
 
   useEffect(() => {
     setGrid(initializeGrid());
@@ -58,6 +60,10 @@ export default function Clean() {
     );
     if (cleared) {
       setVictory(true);
+      setSeal({
+        ...seal,
+        hygiene: seal.hygiene + MAX_STAT_VALUE / 3,
+      });
     }
   };
 

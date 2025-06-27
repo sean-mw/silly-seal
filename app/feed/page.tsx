@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Delete, RotateCcw } from "lucide-react";
+import { MAX_STAT_VALUE, useSeal } from "@/hooks/useSeal";
 
 const FISH_TYPES = [
   "anchovy",
@@ -96,6 +97,7 @@ export default function Play() {
   const [keyboardColors, setKeyboardColors] = useState<Record<string, string>>(
     {}
   );
+  const { seal, setSeal } = useSeal();
 
   useEffect(() => {
     setSecret(getRandomSequence());
@@ -123,6 +125,12 @@ export default function Play() {
     const didWin = feedback.every((f) => f === "correct");
     setVictory(didWin);
     setGameOver(didWin || updatedGuesses.length >= MAX_ATTEMPTS);
+    if (didWin) {
+      setSeal({
+        ...seal,
+        hunger: seal.hunger + MAX_STAT_VALUE / 3,
+      });
+    }
   };
 
   const resetGame = () => {
