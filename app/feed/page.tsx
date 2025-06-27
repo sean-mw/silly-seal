@@ -13,7 +13,7 @@ const FISH_TYPES = [
 ];
 const SEQUENCE_LENGTH = 4;
 const MAX_ATTEMPTS = 6;
-const CELL_SIZE = "w-[min(12vw,12vh,64px)] h-[min(12vw,12vh,64px)]";
+const CELL_SIZE = "w-[min(14vw,14vh,64px)] h-[min(14vw,14vh,64px)]";
 
 type FeedbackType = "correct" | "misplaced" | "wrong";
 
@@ -140,14 +140,14 @@ export default function Play() {
 
   return (
     <div className="flex flex-col w-full h-full items-center justify-center gap-4">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
         {Array.from({ length: MAX_ATTEMPTS }).map((_, rowIdx) => {
           const isCurrent = rowIdx === guesses.length && !gameOver;
           const guessRow = guesses[rowIdx]?.guess ?? [];
           const feedbackRow = guesses[rowIdx]?.feedback ?? [];
 
           return (
-            <div key={rowIdx} className="flex gap-2">
+            <div key={rowIdx} className="flex gap-1">
               {Array.from({ length: SEQUENCE_LENGTH }).map((_, colIdx) => {
                 const fish = isCurrent
                   ? currentGuess[colIdx]
@@ -180,48 +180,49 @@ export default function Play() {
         })}
       </div>
 
-      <div className="flex gap-2">
-        {FISH_TYPES.map((fish) => (
+      <div className="flex flex-col items-center gap-2">
+        <div className="flex gap-2">
+          {FISH_TYPES.map((fish) => (
+            <button
+              key={fish}
+              onClick={() => addFishToGuess(fish)}
+              disabled={gameOver}
+              className={`${CELL_SIZE} border-3 rounded flex items-center justify-center select-none ${
+                keyboardColors[fish] ?? "bg-white"
+              }`}
+              style={{ imageRendering: "pixelated" }}
+            >
+              <Image
+                src={`/${fish}.png`}
+                alt={fish}
+                width={48}
+                height={48}
+                draggable={false}
+                className="w-3/4 h-3/4"
+              />
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2">
           <button
-            key={fish}
-            onClick={() => addFishToGuess(fish)}
-            disabled={gameOver}
-            className={`${CELL_SIZE} border-3 rounded flex items-center justify-center select-none ${
-              keyboardColors[fish] ?? "bg-white"
-            }`}
-            style={{ imageRendering: "pixelated" }}
+            onClick={submitGuess}
+            className={`${CELL_SIZE} border-3 rounded flex items-center justify-center font-bold select-none text-sm`}
           >
-            <Image
-              src={`/${fish}.png`}
-              alt={fish}
-              width={48}
-              height={48}
-              draggable={false}
-              className="w-3/4 h-3/4"
-            />
+            FEED
           </button>
-        ))}
-      </div>
-
-      <div className="flex gap-2">
-        <button
-          onClick={submitGuess}
-          className={`${CELL_SIZE} border-3 rounded flex items-center justify-center font-bold select-none text-sm`}
-        >
-          FEED
-        </button>
-        <button
-          onClick={resetGame}
-          className={`${CELL_SIZE} border-3 rounded flex items-center justify-center`}
-        >
-          <RotateCcw width={48} height={48} className="w-3/4 h-3/4" />
-        </button>
-        <button
-          onClick={removeLastFish}
-          className={`${CELL_SIZE} border-3 rounded flex items-center justify-center`}
-        >
-          <Delete width={48} height={48} className="w-3/4 h-3/4" />
-        </button>
+          <button
+            onClick={resetGame}
+            className={`${CELL_SIZE} border-3 rounded flex items-center justify-center`}
+          >
+            <RotateCcw width={48} height={48} className="w-3/4 h-3/4" />
+          </button>
+          <button
+            onClick={removeLastFish}
+            className={`${CELL_SIZE} border-3 rounded flex items-center justify-center`}
+          >
+            <Delete width={48} height={48} className="w-3/4 h-3/4" />
+          </button>
+        </div>
       </div>
 
       {gameOver && (
