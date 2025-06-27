@@ -18,8 +18,10 @@ function CellButton({
   const background = cell.revealed ? `url('/clean.png')` : `url('/dirty.png')`;
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const longPressed = useRef(false);
+  const touchHandled = useRef(false);
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    touchHandled.current = true;
     longPressed.current = false;
     longPressTimer.current = setTimeout(() => {
       longPressed.current = true;
@@ -32,13 +34,22 @@ function CellButton({
     if (!longPressed.current) {
       onLeftClick();
     }
+    setTimeout(() => {
+      touchHandled.current = false;
+    }, 100);
+  };
+
+  const handleClick = () => {
+    if (!touchHandled.current) {
+      onLeftClick();
+    }
   };
 
   return (
     <button
       className={`${CELL_SIZE} bg-cover relative select-none touch-none`}
       style={{ backgroundImage: background, imageRendering: "pixelated" }}
-      onClick={onLeftClick}
+      onClick={handleClick}
       onContextMenu={onRightClick}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
