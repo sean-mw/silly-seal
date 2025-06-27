@@ -1,7 +1,6 @@
 "use client";
 
 import Button from "@/components/Button";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 
 type Species = {
@@ -64,8 +63,8 @@ export default function Play() {
     const nextDepth = speciesList[nextIdx].average_depth;
 
     const correct =
-      (guess === "higher" && nextDepth < currentDepth) ||
-      (guess === "lower" && nextDepth > currentDepth);
+      (guess === "higher" && nextDepth <= currentDepth) ||
+      (guess === "lower" && nextDepth >= currentDepth);
 
     setShowNextDepth(true);
 
@@ -106,55 +105,54 @@ export default function Play() {
   }) => {
     const species = speciesList[idx];
     return (
-      <div className="flex flex-col py-4 border-3 rounded w-full h-full items-center gap-1">
-        <div>
-          <div className="text-lg font-bold">{species.common_name}</div>
-          <div className="text-gray-700 text-sm">
-            ({species.scientific_name})
+      <div
+        className="relative w-full h-full max-h-100 rounded overflow-hidden bg-cover bg-center border-3 border-black"
+        style={{ backgroundImage: `url(${species.image_urls[0]})` }}
+      >
+        <div className="absolute inset-0 bg-black opacity-40"></div>
+
+        <div className="relative z-10 h-full flex flex-col justify-between p-4 text-white">
+          <div className="text-center">
+            <div className="text-xl font-bold">{species.common_name}</div>
+            <div className="text-sm">({species.scientific_name})</div>
           </div>
-        </div>
-        <Image
-          src={species.image_urls[0]}
-          alt={species.common_name}
-          width={400}
-          height={400}
-        />
-        {showDepth !== false ? (
-          <div>
-            <div>Lives at ~{species.average_depth}m*</div>
-            <div className="text-gray-700 text-sm">
-              *Calculated from {species.occurrence_count} observations
+
+          {showDepth !== false ? (
+            <div className="text-center bg-black opacity-60 rounded p-2">
+              <div className="font-semibold opacity-100">
+                Lives at ~{species.average_depth}m
+              </div>
+              <div className="text-xs opacity-100">
+                Calculated from {species.occurrence_count} occurrences
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="flex justify-center gap-4 pt-2">
-            <Button
-              className="w-24 bg-blue-300 text-black"
-              onClick={() => handleGuess("higher")}
-            >
-              Shallower
-            </Button>
-            <Button
-              className="w-24 bg-blue-900"
-              onClick={() => handleGuess("lower")}
-            >
-              Deeper
-            </Button>
-          </div>
-        )}
+          ) : (
+            <div className="flex gap-2">
+              <Button
+                className="flex-1 bg-white text-black opacity-80 hover:opacity-100"
+                onClick={() => handleGuess("higher")}
+              >
+                Shallower
+              </Button>
+              <Button
+                className="flex-1 bg-black text-white opacity-80 hover:opacity-100"
+                onClick={() => handleGuess("lower")}
+              >
+                Deeper
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     );
   };
 
   return (
-    <div className="flex flex-col w-full h-full gap-4 text-center items-center">
-      <h1 className="text-2xl font-bold">Which species lives deeper?</h1>
-
+    <div className="flex flex-col w-full h-full gap-2 text-center items-center justify-center">
       {!gameOver ? (
         <>
           <SpeciesCard idx={currentIdx} />
           <SpeciesCard idx={nextIdx} showDepth={showNextDepth} />
-          <p className="text-lg pt-2">Score: {score}</p>
         </>
       ) : (
         <div className="space-y-4">

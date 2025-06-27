@@ -61,7 +61,7 @@ async function seed() {
     for (const species of speciesList) {
       const images = rlsByScientificName[species.scientificName.toLowerCase()];
 
-      if (!images || images.length === 0) continue;
+      if (!images || images.length === 0 || species.averageDepth <= 0) continue;
 
       await sql`
         INSERT INTO species (
