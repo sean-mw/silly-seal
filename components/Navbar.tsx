@@ -13,7 +13,7 @@ export default function Navbar() {
     <>
       {!isRoot && (
         <div className="pb-4">
-          <Button onClick={() => router.back()}>←</Button>
+          <Button onClick={() => router.push("/")}>←</Button>
         </div>
       )}
     </>
