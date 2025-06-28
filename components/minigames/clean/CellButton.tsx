@@ -1,8 +1,7 @@
-import { Cell } from "@/lib/minesweeper";
+import { GAME_CONFIG } from "@/lib/minigames/clean/config";
+import { Cell } from "@/types/minigames/clean";
 import Image from "next/image";
 import { useRef } from "react";
-
-const CELL_SIZE = "w-[min(10vw,10vh,64px)] h-[min(10vw,10vh,64px)]";
 
 function CellButton({
   cell,
@@ -47,7 +46,7 @@ function CellButton({
 
   return (
     <button
-      className={`${CELL_SIZE} bg-cover relative select-none touch-none`}
+      className={`${GAME_CONFIG.CELL_SIZE} bg-cover relative select-none touch-none`}
       style={{ backgroundImage: background, imageRendering: "pixelated" }}
       onClick={handleClick}
       onContextMenu={onRightClick}

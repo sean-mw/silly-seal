@@ -1,174 +1,143 @@
 "use client";
 
-import Button from "@/components/Button";
-import { useSeal } from "@/hooks/useSeal";
-import { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { MiniGame } from "@/components/minigames/MiniGame";
+import { useMiniGame } from "@/hooks/useMiniGame";
+import { DepthGameState } from "@/types/minigames/depth";
+import { DepthGameEngine } from "@/lib/minigames/depth/engine";
+import { GAME_CONFIG } from "@/lib/minigames/depth/config";
+import GameContent from "@/components/minigames/depth/GameContent";
 
-type Species = {
-  scientific_name: string;
-  common_name: string;
-  average_depth: number;
-  occurrence_count: number;
-  image_urls: string[];
+const INITIAL_STATE: DepthGameState = {
+  isGameOver: false,
+  isVictory: false,
+  score: 0,
+  speciesList: [],
+  showNextDepth: false,
+  isLoading: true,
 };
 
-function getRandomIndex(max: number, excludeIndex?: number): number {
-  let idx = Math.floor(Math.random() * max);
-  while (idx === excludeIndex) {
-    idx = Math.floor(Math.random() * max);
-  }
-  return idx;
-}
-
-export default function Play() {
-  const [speciesList, setSpeciesList] = useState<Species[]>([]);
-  const [score, setScore] = useState(0);
-  const [gameOver, setGameOver] = useState(false);
-  const [currentIdx, setCurrentIdx] = useState<number | null>(null);
-  const [nextIdx, setNextIdx] = useState<number | null>(null);
-  const [showNextDepth, setShowNextDepth] = useState(false);
-  const { seal, setSeal } = useSeal();
+function DepthGame() {
+  const { gameState, updateGameState, endGame, resetGame } =
+    useMiniGame(INITIAL_STATE);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const initializeGame = async () => {
       try {
-        const res = await fetch("/api/species");
-        const data: Species[] = await res.json();
+        const species = await DepthGameEngine.loadSpecies();
+        const firstIdx = DepthGameEngine.getRandomIndex(species.length);
+        const secondIdx = DepthGameEngine.getRandomIndex(
+          species.length,
+          firstIdx
+        );
 
-        if (data.length < 2) {
-          console.error(
-            "Not enough species to play the game. Got only:",
-            data.length
-          );
-          return;
-        }
-
-        setSpeciesList(data);
-
-        const first = getRandomIndex(data.length);
-        const second = getRandomIndex(data.length, first);
-        setCurrentIdx(first);
-        setNextIdx(second);
-      } catch (e) {
-        console.error("Failed to load species from DB", e);
+        updateGameState((prev) => ({
+          ...prev,
+          speciesList: species,
+          currentIdx: firstIdx,
+          nextIdx: secondIdx,
+          isLoading: false,
+        }));
+      } catch (error) {
+        console.error("Failed to initialize game:", error);
+        updateGameState((prev) => ({
+          ...prev,
+          isLoading: false,
+        }));
       }
     };
 
-    fetchData();
-  }, []);
+    initializeGame();
+  }, [updateGameState]);
 
   const handleGuess = (guess: "higher" | "lower") => {
-    if (currentIdx === null || nextIdx === null || speciesList.length < 2)
+    if (
+      gameState.currentIdx === undefined ||
+      gameState.nextIdx === undefined ||
+      gameState.isGameOver ||
+      gameState.showNextDepth
+    ) {
       return;
+    }
 
-    const currentDepth = speciesList[currentIdx].average_depth;
-    const nextDepth = speciesList[nextIdx].average_depth;
+    const currentDepth =
+      gameState.speciesList[gameState.currentIdx].average_depth;
+    const nextDepth = gameState.speciesList[gameState.nextIdx].average_depth;
 
-    const correct =
-      (guess === "higher" && nextDepth <= currentDepth) ||
-      (guess === "lower" && nextDepth >= currentDepth);
+    const isCorrect = DepthGameEngine.isGuessCorrect(
+      guess,
+      currentDepth,
+      nextDepth
+    );
 
-    setShowNextDepth(true);
+    updateGameState((prev) => ({
+      ...prev,
+      showNextDepth: true,
+    }));
 
     setTimeout(() => {
-      if (correct) {
-        setScore((s) => s + 1);
-        setCurrentIdx(nextIdx);
-        const newNextIdx = getRandomIndex(speciesList.length, nextIdx);
-        setNextIdx(newNextIdx);
-        setShowNextDepth(false);
+      if (isCorrect) {
+        const newScore = gameState.score + 1;
+        const newNextIdx = DepthGameEngine.getRandomIndex(
+          gameState.speciesList.length,
+          gameState.nextIdx
+        );
+
+        updateGameState((prev) => ({
+          ...prev,
+          score: newScore,
+          currentIdx: gameState.nextIdx,
+          nextIdx: newNextIdx,
+          showNextDepth: false,
+        }));
       } else {
-        setGameOver(true);
-        setSeal({
-          ...seal,
-          happiness: seal.happiness + score * 3,
+        updateGameState((prev) => ({
+          ...prev,
+          isGameOver: true,
+        }));
+
+        endGame({
+          score: gameState.score,
+          statRewards: {
+            happiness: gameState.score * GAME_CONFIG.SCORE_MULTIPLIER,
+          },
         });
       }
-    }, 1500);
+    }, GAME_CONFIG.REVEAL_DELAY);
   };
 
-  const handleRestart = () => {
-    if (speciesList.length < 2) return;
-    const first = getRandomIndex(speciesList.length);
-    const second = getRandomIndex(speciesList.length, first);
-    setCurrentIdx(first);
-    setNextIdx(second);
-    setScore(0);
-    setGameOver(false);
-    setShowNextDepth(false);
-  };
-
-  if (speciesList.length === 0 || currentIdx === null || nextIdx === null) {
-    return <div className="text-center pt-8">Loading game...</div>;
-  }
-
-  const SpeciesCard = ({
-    idx,
-    showDepth,
-  }: {
-    idx: number;
-    showDepth?: boolean;
-  }) => {
-    const species = speciesList[idx];
-    return (
-      <div
-        className="relative w-full h-full max-h-100 rounded overflow-hidden bg-cover bg-center border-3 border-black"
-        style={{ backgroundImage: `url(${species.image_urls[0]})` }}
-      >
-        <div className="absolute inset-0 bg-black/40" />
-
-        <div className="relative z-10 h-full flex flex-col justify-between p-4 text-white">
-          <div className="text-center">
-            <div className="text-xl font-bold">{species.common_name}</div>
-            <div className="text-sm">({species.scientific_name})</div>
-          </div>
-
-          {showDepth !== false ? (
-            <div className="text-center bg-black/60 rounded p-2">
-              <div className="font-semibold">
-                Lives at ~{species.average_depth}m
-              </div>
-              <div className="text-xs">
-                Calculated from {species.occurrence_count} occurrences
-              </div>
-            </div>
-          ) : (
-            <div className="flex gap-2">
-              <Button
-                className="flex-1 bg-white/80 text-black hover:bg-white/100"
-                onClick={() => handleGuess("higher")}
-              >
-                Shallower
-              </Button>
-              <Button
-                className="flex-1 bg-black/80 text-white hover:bg-black/100"
-                onClick={() => handleGuess("lower")}
-              >
-                Deeper
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
+  const handleRestart = async () => {
+    const firstIdx = DepthGameEngine.getRandomIndex(
+      gameState.speciesList.length
     );
+    const secondIdx = DepthGameEngine.getRandomIndex(
+      gameState.speciesList.length,
+      firstIdx
+    );
+
+    resetGame({
+      ...INITIAL_STATE,
+      speciesList: gameState.speciesList,
+      currentIdx: firstIdx,
+      nextIdx: secondIdx,
+      isLoading: false,
+    });
   };
 
   return (
-    <div className="flex flex-col w-full h-full gap-2 text-center items-center justify-center">
-      {!gameOver ? (
-        <>
-          <SpeciesCard idx={currentIdx} />
-          <SpeciesCard idx={nextIdx} showDepth={showNextDepth} />
-        </>
-      ) : (
-        <div className="space-y-4">
-          <p className="text-xl font-semibold">Game Over!</p>
-          <p className="text-lg">Final Score: {score}</p>
-          <Button className="w-24" onClick={handleRestart}>
-            Restart
-          </Button>
-        </div>
-      )}
-    </div>
+    <MiniGame
+      config={{
+        name: "Depth Guesser",
+        description:
+          "Guess whether the next species lives at a shallower or deeper depth!",
+        allowRestart: true,
+      }}
+      gameState={gameState}
+      onRestart={handleRestart}
+    >
+      <GameContent gameState={gameState} onGuess={handleGuess} />
+    </MiniGame>
   );
 }
+
+export default DepthGame;

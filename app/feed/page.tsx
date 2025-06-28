@@ -1,243 +1,126 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { Delete, RotateCcw } from "lucide-react";
-import { MAX_STAT_VALUE, useSeal } from "@/hooks/useSeal";
+import React, { useEffect } from "react";
+import { MiniGame } from "@/components/minigames/MiniGame";
+import { useMiniGame } from "@/hooks/useMiniGame";
+import { GuessWithFeedback, FeedGameState } from "@/types/minigames/feed";
+import { FeedGameEngine } from "@/lib/minigames/feed/engine";
+import { GAME_CONFIG } from "@/lib/minigames/feed/config";
+import GameGrid from "@/components/minigames/feed/GameGrid";
+import GameControls from "@/components/minigames/feed/GameControls";
 
-const FISH_TYPES = [
-  "anchovy",
-  "clownfish",
-  "crab",
-  "pufferfish",
-  "surgeonfish",
-];
-const SEQUENCE_LENGTH = 4;
-const MAX_ATTEMPTS = 6;
-const CELL_SIZE = "w-[min(14vw,14vh,64px)] h-[min(14vw,14vh,64px)]";
+const INITIAL_STATE: FeedGameState = {
+  isGameOver: false,
+  isVictory: false,
+  score: 0,
+  secret: [],
+  currentGuess: [],
+  guesses: [],
+  keyboardColors: {},
+};
 
-type FeedbackType = "correct" | "misplaced" | "wrong";
-
-function getRandomSequence(): string[] {
-  return Array.from(
-    { length: SEQUENCE_LENGTH },
-    () => FISH_TYPES[Math.floor(Math.random() * FISH_TYPES.length)]
-  );
-}
-
-function getFeedback(secret: string[], guess: string[]): FeedbackType[] {
-  const feedback = Array<FeedbackType>(SEQUENCE_LENGTH).fill("wrong");
-  const usedHint = Array(SEQUENCE_LENGTH).fill(false);
-  const usedGuess = Array(SEQUENCE_LENGTH).fill(false);
-
-  for (let i = 0; i < SEQUENCE_LENGTH; i++) {
-    if (guess[i] === secret[i]) {
-      feedback[i] = "correct";
-      usedHint[i] = true;
-      usedGuess[i] = true;
-    }
-  }
-
-  for (let i = 0; i < SEQUENCE_LENGTH; i++) {
-    if (!usedGuess[i]) {
-      for (let j = 0; j < SEQUENCE_LENGTH; j++) {
-        if (!usedHint[j] && guess[i] === secret[j]) {
-          feedback[i] = "misplaced";
-          usedHint[j] = true;
-          break;
-        }
-      }
-    }
-  }
-
-  return feedback;
-}
-
-function getColorClass(feedback?: FeedbackType): string {
-  return feedback === "correct"
-    ? "bg-green-500"
-    : feedback === "misplaced"
-    ? "bg-yellow-500"
-    : feedback === "wrong"
-    ? "bg-gray-500"
-    : "bg-white";
-}
-
-function computeKeyboardColors(
-  guesses: { guess: string[]; feedback: FeedbackType[] }[]
-): Record<string, string> {
-  const colors: Record<string, string> = {};
-
-  for (const { guess, feedback } of guesses) {
-    for (let i = 0; i < guess.length; i++) {
-      const fish = guess[i];
-      const fb = feedback[i];
-
-      if (fb === "correct") {
-        colors[fish] = "bg-green-500";
-      } else if (fb === "misplaced" && colors[fish] !== "bg-green-500") {
-        colors[fish] = "bg-yellow-500";
-      } else if (fb === "wrong" && !colors[fish]) {
-        colors[fish] = "bg-gray-500";
-      }
-    }
-  }
-
-  return colors;
-}
-
-export default function Play() {
-  const [secret, setSecret] = useState<string[]>([]);
-  const [currentGuess, setCurrentGuess] = useState<string[]>([]);
-  const [guesses, setGuesses] = useState<
-    { guess: string[]; feedback: FeedbackType[] }[]
-  >([]);
-  const [gameOver, setGameOver] = useState(false);
-  const [victory, setVictory] = useState(false);
-  const [keyboardColors, setKeyboardColors] = useState<Record<string, string>>(
-    {}
-  );
-  const { seal, setSeal } = useSeal();
+function FeedGame() {
+  const { gameState, updateGameState, endGame, resetGame } =
+    useMiniGame(INITIAL_STATE);
 
   useEffect(() => {
-    setSecret(getRandomSequence());
-  }, []);
+    updateGameState((prev) => ({
+      ...prev,
+      secret: FeedGameEngine.generateRandomSequence(),
+    }));
+  }, [updateGameState]);
 
-  useEffect(() => {
-    setKeyboardColors(computeKeyboardColors(guesses));
-  }, [guesses]);
-
-  const addFishToGuess = (fish: string) => {
-    if (!gameOver && currentGuess.length < SEQUENCE_LENGTH) {
-      setCurrentGuess((prev) => [...prev, fish]);
+  const handleAddFish = (fish: string) => {
+    if (
+      !gameState.isGameOver &&
+      gameState.currentGuess.length < GAME_CONFIG.SEQUENCE_LENGTH
+    ) {
+      updateGameState((prev) => ({
+        ...prev,
+        currentGuess: [...prev.currentGuess, fish],
+      }));
     }
   };
 
-  const submitGuess = () => {
-    if (currentGuess.length !== SEQUENCE_LENGTH || gameOver) return;
+  const handleRemoveLastFish = () => {
+    updateGameState((prev) => ({
+      ...prev,
+      currentGuess: prev.currentGuess.slice(0, -1),
+    }));
+  };
 
-    const feedback = getFeedback(secret, currentGuess);
-    const updatedGuesses = [...guesses, { guess: currentGuess, feedback }];
+  const handleSubmitGuess = () => {
+    if (
+      gameState.currentGuess.length !== GAME_CONFIG.SEQUENCE_LENGTH ||
+      gameState.isGameOver
+    ) {
+      return;
+    }
 
-    setGuesses(updatedGuesses);
-    setCurrentGuess([]);
+    const feedback = FeedGameEngine.calculateFeedback(
+      gameState.secret,
+      gameState.currentGuess
+    );
+    const newGuess: GuessWithFeedback = {
+      guess: gameState.currentGuess,
+      feedback,
+    };
+    const updatedGuesses = [...gameState.guesses, newGuess];
 
-    const didWin = feedback.every((f) => f === "correct");
-    setVictory(didWin);
-    setGameOver(didWin || updatedGuesses.length >= MAX_ATTEMPTS);
-    if (didWin) {
-      setSeal({
-        ...seal,
-        hunger: seal.hunger + MAX_STAT_VALUE / 3,
+    const didWin = FeedGameEngine.isGameWon(feedback);
+    const isGameOver = FeedGameEngine.isGameOver(updatedGuesses, didWin);
+    const score = FeedGameEngine.calculateScore(updatedGuesses, didWin);
+
+    updateGameState((prev) => ({
+      ...prev,
+      guesses: updatedGuesses,
+      currentGuess: [],
+      keyboardColors: FeedGameEngine.computeKeyboardColors(updatedGuesses),
+      score,
+    }));
+
+    if (isGameOver) {
+      endGame({
+        statRewards: { hunger: score * GAME_CONFIG.SCORE_MULTIPLIER },
+        score,
       });
     }
   };
 
-  const resetGame = () => {
-    setSecret(getRandomSequence());
-    setCurrentGuess([]);
-    setGuesses([]);
-    setVictory(false);
-    setGameOver(false);
-    setKeyboardColors({});
-  };
-
-  const removeLastFish = () => {
-    setCurrentGuess((prev) => prev.slice(0, -1));
+  const handleRestart = () => {
+    resetGame({
+      ...INITIAL_STATE,
+      secret: FeedGameEngine.generateRandomSequence(),
+    });
   };
 
   return (
-    <div className="flex flex-col w-full h-full items-center justify-center gap-4">
-      <div className="flex flex-col gap-1">
-        {Array.from({ length: MAX_ATTEMPTS }).map((_, rowIdx) => {
-          const isCurrent = rowIdx === guesses.length && !gameOver;
-          const guessRow = guesses[rowIdx]?.guess ?? [];
-          const feedbackRow = guesses[rowIdx]?.feedback ?? [];
+    <MiniGame
+      config={{
+        name: "Feed Mini-Game",
+        description: "Feed the seal by guessing the correct sequence of fish!",
+        allowRestart: true,
+      }}
+      gameState={gameState}
+      onRestart={handleRestart}
+    >
+      <GameGrid
+        guesses={gameState.guesses}
+        currentGuess={gameState.currentGuess}
+        isGameOver={gameState.isGameOver}
+      />
 
-          return (
-            <div key={rowIdx} className="flex gap-1">
-              {Array.from({ length: SEQUENCE_LENGTH }).map((_, colIdx) => {
-                const fish = isCurrent
-                  ? currentGuess[colIdx]
-                  : guessRow[colIdx];
-                const feedback = isCurrent ? undefined : feedbackRow[colIdx];
-                const colorClass = getColorClass(feedback);
-
-                return (
-                  <div
-                    key={colIdx}
-                    className={`${CELL_SIZE} border-3 rounded flex items-center justify-center ${colorClass}`}
-                    style={{
-                      imageRendering: "pixelated",
-                    }}
-                  >
-                    {fish && (
-                      <Image
-                        src={`/${fish}.png`}
-                        alt={fish}
-                        width={48}
-                        height={48}
-                        className="w-3/4 h-3/4"
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="flex flex-col items-center gap-2">
-        <div className="flex gap-2">
-          {FISH_TYPES.map((fish) => (
-            <button
-              key={fish}
-              onClick={() => addFishToGuess(fish)}
-              disabled={gameOver}
-              className={`${CELL_SIZE} border-3 rounded flex items-center justify-center select-none ${
-                keyboardColors[fish] ?? "bg-white"
-              }`}
-              style={{ imageRendering: "pixelated" }}
-            >
-              <Image
-                src={`/${fish}.png`}
-                alt={fish}
-                width={48}
-                height={48}
-                draggable={false}
-                className="w-3/4 h-3/4"
-              />
-            </button>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={submitGuess}
-            className={`${CELL_SIZE} border-3 rounded flex items-center justify-center font-bold select-none text-sm`}
-          >
-            FEED
-          </button>
-          <button
-            onClick={resetGame}
-            className={`${CELL_SIZE} border-3 rounded flex items-center justify-center`}
-          >
-            <RotateCcw width={48} height={48} className="w-3/4 h-3/4" />
-          </button>
-          <button
-            onClick={removeLastFish}
-            className={`${CELL_SIZE} border-3 rounded flex items-center justify-center`}
-          >
-            <Delete width={48} height={48} className="w-3/4 h-3/4" />
-          </button>
-        </div>
-      </div>
-
-      {gameOver && (
-        <div className="text-lg font-semibold text-center">
-          {victory ? "The seal is happy!" : "The seal is still hungry!"}
-        </div>
-      )}
-    </div>
+      <GameControls
+        onAddFish={handleAddFish}
+        onSubmitGuess={handleSubmitGuess}
+        onRestart={handleRestart}
+        onRemoveLastFish={handleRemoveLastFish}
+        isGameOver={gameState.isGameOver}
+        currentGuessLength={gameState.currentGuess.length}
+        keyboardColors={gameState.keyboardColors}
+      />
+    </MiniGame>
   );
 }
+
+export default FeedGame;
