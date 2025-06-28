@@ -1,8 +1,11 @@
 import { useState, useCallback } from "react";
-import { useSeal, MAX_STAT_VALUE, SealState } from "@/hooks/useSeal";
-import { GameResult, GameState } from "@/types/minigames/common";
+import { SealState, useSeal } from "@/hooks/useSeal";
+import { GameState } from "@/types/minigames/common";
 
-export function useMiniGame<T extends GameState>(initialState: T) {
+export function useMiniGame<T extends GameState>(
+  initialState: T,
+  relatedStat: keyof SealState
+) {
   const [gameState, setGameState] = useState<T>(initialState);
   const { seal, setSeal } = useSeal();
 
@@ -11,27 +14,19 @@ export function useMiniGame<T extends GameState>(initialState: T) {
   }, []);
 
   const endGame = useCallback(
-    (result: GameResult) => {
+    (statReward: number) => {
       setGameState((prev) => ({
         ...prev,
         isGameOver: true,
-        score: result.score,
+        lastPlayedAt: Date.now(),
       }));
 
-      const updatedSeal = { ...seal };
-      Object.entries(result.statRewards).forEach(([stat, reward]) => {
-        if (!(stat in seal) || !reward) return;
-
-        const currentValue = seal[stat as keyof SealState] as number;
-        updatedSeal[stat as keyof SealState] = Math.min(
-          MAX_STAT_VALUE,
-          currentValue + reward
-        );
+      setSeal({
+        ...seal,
+        [relatedStat]: seal[relatedStat] + statReward,
       });
-
-      setSeal(updatedSeal);
     },
-    [seal, setSeal]
+    [relatedStat, seal, setSeal]
   );
 
   const resetGame = useCallback((newInitialState: T) => {
@@ -43,6 +38,5 @@ export function useMiniGame<T extends GameState>(initialState: T) {
     updateGameState,
     endGame,
     resetGame,
-    seal,
   };
 }

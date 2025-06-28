@@ -9,7 +9,5 @@ export type Cell = {
 
 export interface CleanGameState extends GameState {
   isGameOver: boolean;
-  isVictory: boolean;
-  score: number;
   grid: Cell[][];
 }

@@ -11,8 +11,6 @@ import GameControls from "@/components/minigames/feed/GameControls";
 
 const INITIAL_STATE: FeedGameState = {
   isGameOver: false,
-  isVictory: false,
-  score: 0,
   secret: [],
   currentGuess: [],
   guesses: [],
@@ -21,7 +19,7 @@ const INITIAL_STATE: FeedGameState = {
 
 function FeedGame() {
   const { gameState, updateGameState, endGame, resetGame } =
-    useMiniGame(INITIAL_STATE);
+    useMiniGame<FeedGameState>(INITIAL_STATE, "hunger");
 
   useEffect(() => {
     updateGameState((prev) => ({
@@ -67,23 +65,17 @@ function FeedGame() {
     };
     const updatedGuesses = [...gameState.guesses, newGuess];
 
-    const didWin = FeedGameEngine.isGameWon(feedback);
-    const isGameOver = FeedGameEngine.isGameOver(updatedGuesses, didWin);
-    const score = FeedGameEngine.calculateScore(updatedGuesses, didWin);
-
     updateGameState((prev) => ({
       ...prev,
       guesses: updatedGuesses,
       currentGuess: [],
       keyboardColors: FeedGameEngine.computeKeyboardColors(updatedGuesses),
-      score,
     }));
 
+    const isGameWon = FeedGameEngine.isGameWon(feedback);
+    const isGameOver = FeedGameEngine.isGameOver(updatedGuesses, isGameWon);
     if (isGameOver) {
-      endGame({
-        statRewards: { hunger: score * GAME_CONFIG.SCORE_MULTIPLIER },
-        score,
-      });
+      endGame(GAME_CONFIG.STAT_REWARD);
     }
   };
 
@@ -109,7 +101,6 @@ function FeedGame() {
         currentGuess={gameState.currentGuess}
         isGameOver={gameState.isGameOver}
       />
-
       <GameControls
         onAddFish={handleAddFish}
         onSubmitGuess={handleSubmitGuess}

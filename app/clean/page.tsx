@@ -9,14 +9,14 @@ import { useMiniGame } from "@/hooks/useMiniGame";
 
 const INITIAL_STATE: CleanGameState = {
   isGameOver: false,
-  isVictory: false,
-  score: 0,
   grid: [],
 };
 
 function CleanGame() {
-  const { gameState, updateGameState, endGame, resetGame } =
-    useMiniGame(INITIAL_STATE);
+  const { gameState, updateGameState, endGame, resetGame } = useMiniGame(
+    INITIAL_STATE,
+    "hygiene"
+  );
 
   useEffect(() => {
     updateGameState((prev) => ({

@@ -5,7 +5,7 @@ export const GAME_CONFIG = {
   CELL_SIZE: "w-[min(14vw,14vh,64px)] h-[min(14vw,14vh,64px)]",
   BUTTON_STYLE:
     "border-3 rounded flex items-center justify-center disabled:opacity-50",
-  SCORE_MULTIPLIER: 20,
+  STAT_REWARD: 50,
 };
 
 export const FEEDBACK_COLORS = {

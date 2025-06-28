@@ -10,7 +10,6 @@ export interface Species {
 
 export interface DepthGameState extends GameState {
   isGameOver: boolean;
-  isVictory: boolean;
   score: number;
   speciesList: Species[];
   currentIdx?: number;

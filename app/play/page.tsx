@@ -10,7 +10,6 @@ import GameContent from "@/components/minigames/depth/GameContent";
 
 const INITIAL_STATE: DepthGameState = {
   isGameOver: false,
-  isVictory: false,
   score: 0,
   speciesList: [],
   showNextDepth: false,
@@ -18,8 +17,10 @@ const INITIAL_STATE: DepthGameState = {
 };
 
 function DepthGame() {
-  const { gameState, updateGameState, endGame, resetGame } =
-    useMiniGame(INITIAL_STATE);
+  const { gameState, updateGameState, endGame, resetGame } = useMiniGame(
+    INITIAL_STATE,
+    "happiness"
+  );
 
   useEffect(() => {
     const initializeGame = async () => {
@@ -77,7 +78,6 @@ function DepthGame() {
 
     setTimeout(() => {
       if (isCorrect) {
-        const newScore = gameState.score + 1;
         const newNextIdx = DepthGameEngine.getRandomIndex(
           gameState.speciesList.length,
           gameState.nextIdx
@@ -85,7 +85,7 @@ function DepthGame() {
 
         updateGameState((prev) => ({
           ...prev,
-          score: newScore,
+          score: prev.score + 1,
           currentIdx: gameState.nextIdx,
           nextIdx: newNextIdx,
           showNextDepth: false,
@@ -96,12 +96,7 @@ function DepthGame() {
           isGameOver: true,
         }));
 
-        endGame({
-          score: gameState.score,
-          statRewards: {
-            happiness: gameState.score * GAME_CONFIG.SCORE_MULTIPLIER,
-          },
-        });
+        endGame(GAME_CONFIG.SCORE_MULTIPLIER * gameState.score);
       }
     }, GAME_CONFIG.REVEAL_DELAY);
   };

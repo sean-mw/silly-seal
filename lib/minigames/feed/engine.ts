@@ -76,9 +76,4 @@ export class FeedGameEngine {
   static isGameOver(guesses: GuessWithFeedback[], won: boolean): boolean {
     return won || guesses.length >= GAME_CONFIG.MAX_ATTEMPTS;
   }
-
-  static calculateScore(guesses: GuessWithFeedback[], didWin: boolean): number {
-    if (!didWin) return 0;
-    return GAME_CONFIG.MAX_ATTEMPTS - guesses.length;
-  }
 }
