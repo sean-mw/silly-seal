@@ -115,7 +115,7 @@ export default function Play() {
         className="relative w-full h-full max-h-100 rounded overflow-hidden bg-cover bg-center border-3 border-black"
         style={{ backgroundImage: `url(${species.image_urls[0]})` }}
       >
-        <div className="absolute inset-0 bg-black opacity-40"></div>
+        <div className="absolute inset-0 bg-black/40" />
 
         <div className="relative z-10 h-full flex flex-col justify-between p-4 text-white">
           <div className="text-center">
@@ -124,24 +124,24 @@ export default function Play() {
           </div>
 
           {showDepth !== false ? (
-            <div className="text-center bg-black opacity-60 rounded p-2">
-              <div className="font-semibold opacity-100">
+            <div className="text-center bg-black/60 rounded p-2">
+              <div className="font-semibold">
                 Lives at ~{species.average_depth}m
               </div>
-              <div className="text-xs opacity-100">
+              <div className="text-xs">
                 Calculated from {species.occurrence_count} occurrences
               </div>
             </div>
           ) : (
             <div className="flex gap-2">
               <Button
-                className="flex-1 bg-white text-black opacity-80 hover:opacity-100"
+                className="flex-1 bg-white/80 text-black hover:bg-white/100"
                 onClick={() => handleGuess("higher")}
               >
                 Shallower
               </Button>
               <Button
-                className="flex-1 bg-black text-white opacity-80 hover:opacity-100"
+                className="flex-1 bg-black/80 text-white hover:bg-black/100"
                 onClick={() => handleGuess("lower")}
               >
                 Deeper
