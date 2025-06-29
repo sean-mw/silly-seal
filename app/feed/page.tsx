@@ -11,6 +11,7 @@ import GameControls from "@/components/minigames/feed/GameControls";
 
 const INITIAL_STATE: FeedGameState = {
   isGameOver: false,
+  rewardStat: "hunger",
   secret: [],
   currentGuess: [],
   guesses: [],
@@ -19,7 +20,7 @@ const INITIAL_STATE: FeedGameState = {
 
 function FeedGame() {
   const { gameState, setGameState, endGame, resetGame } =
-    useMiniGame<FeedGameState>(INITIAL_STATE, "hunger");
+    useMiniGame<FeedGameState>(INITIAL_STATE);
 
   useEffect(() => {
     setGameState((prev) => ({
@@ -91,7 +92,7 @@ function FeedGame() {
       config={{
         name: "Feed Mini-Game",
         description: "Feed the seal by guessing the correct sequence of fish!",
-        allowRestart: true,
+        allowRestart: process.env.NODE_ENV === "development",
       }}
       gameState={gameState}
       onRestart={handleRestart}

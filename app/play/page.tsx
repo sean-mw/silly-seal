@@ -10,6 +10,7 @@ import GameContent from "@/components/minigames/depth/GameContent";
 
 const INITIAL_STATE: DepthGameState = {
   isGameOver: false,
+  rewardStat: "happiness",
   score: 0,
   speciesList: [],
   showNextDepth: false,
@@ -17,10 +18,8 @@ const INITIAL_STATE: DepthGameState = {
 };
 
 function DepthGame() {
-  const { gameState, setGameState, endGame, resetGame } = useMiniGame(
-    INITIAL_STATE,
-    "happiness"
-  );
+  const { gameState, setGameState, endGame, resetGame } =
+    useMiniGame(INITIAL_STATE);
 
   useEffect(() => {
     const initializeGame = async () => {
@@ -125,7 +124,7 @@ function DepthGame() {
         name: "Depth Guesser",
         description:
           "Guess whether the next species lives at a shallower or deeper depth!",
-        allowRestart: true,
+        allowRestart: process.env.NODE_ENV === "development",
       }}
       gameState={gameState}
       onRestart={handleRestart}

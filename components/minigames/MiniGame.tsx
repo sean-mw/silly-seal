@@ -34,6 +34,12 @@ export function MiniGame({
       {gameState.isGameOver && countdown && (
         <div className="flex flex-col gap-2 text-center items-center">
           <div className="text-lg font-semibold">Game Over!</div>
+          <div>
+            You earned{" "}
+            <span className="font-bold">
+              {gameState.rewardValue} {gameState.rewardStat}
+            </span>
+          </div>
           <div>You can play again in:</div>
           <div className="text-xl font-mono">{formatCountdown(countdown)}</div>
           {config.allowRestart !== false && (

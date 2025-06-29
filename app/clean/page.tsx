@@ -9,14 +9,13 @@ import { useMiniGame } from "@/hooks/useMiniGame";
 
 const INITIAL_STATE: CleanGameState = {
   isGameOver: false,
+  rewardStat: "cleanliness",
   grid: [],
 };
 
 function CleanGame() {
-  const { gameState, setGameState, endGame, resetGame } = useMiniGame(
-    INITIAL_STATE,
-    "hygiene"
-  );
+  const { gameState, setGameState, endGame, resetGame } =
+    useMiniGame(INITIAL_STATE);
 
   useEffect(() => {
     setGameState((prev) => ({
@@ -37,7 +36,7 @@ function CleanGame() {
       config={{
         name: "Clean the Seal",
         description: "Clean the seal enclosure while avoiding rocks!",
-        allowRestart: true,
+        allowRestart: process.env.NODE_ENV === "development",
       }}
       gameState={gameState}
       onRestart={handleRestart}

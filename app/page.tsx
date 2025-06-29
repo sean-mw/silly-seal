@@ -50,14 +50,6 @@ export default function Home() {
         className="flex flex-col w-full border-b-3 border-x-3 border-black rounded"
       >
         <StatusBar
-          title={"Hunger"}
-          percent={sealState.hunger / 100}
-          buttonLabel={"Feed"}
-          onClick={() => {
-            router.push("/feed");
-          }}
-        />
-        <StatusBar
           title={"Happiness"}
           percent={sealState.happiness / 100}
           buttonLabel={"Play"}
@@ -66,8 +58,16 @@ export default function Home() {
           }}
         />
         <StatusBar
-          title={"Hygiene"}
-          percent={sealState.hygiene / 100}
+          title={"Hunger"}
+          percent={sealState.hunger / 100}
+          buttonLabel={"Feed"}
+          onClick={() => {
+            router.push("/feed");
+          }}
+        />
+        <StatusBar
+          title={"Cleanliness"}
+          percent={sealState.cleanliness / 100}
           buttonLabel={"Clean"}
           onClick={() => {
             router.push("/clean");

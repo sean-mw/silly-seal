@@ -7,7 +7,7 @@ import usePersistedState from "./usePersistedState";
 export type SealState = {
   hunger: number;
   happiness: number;
-  hygiene: number;
+  cleanliness: number;
   lastUpdate: number;
 };
 
@@ -19,7 +19,7 @@ const STORAGE_KEY = "sealState";
 const defaultState: SealState = {
   hunger: INITIAL_STAT_VALUE,
   happiness: INITIAL_STAT_VALUE,
-  hygiene: INITIAL_STAT_VALUE,
+  cleanliness: INITIAL_STAT_VALUE,
   lastUpdate: Date.now(),
 };
 
@@ -33,7 +33,7 @@ function calculateDecay(state: SealState): SealState {
     ...state,
     hunger: Math.max(0, state.hunger - DAILY_DECAY * daysPassed),
     happiness: Math.max(0, state.happiness - DAILY_DECAY * daysPassed),
-    hygiene: Math.max(0, state.hygiene - DAILY_DECAY * daysPassed),
+    cleanliness: Math.max(0, state.cleanliness - DAILY_DECAY * daysPassed),
     lastUpdate: now,
   };
 }
@@ -68,7 +68,7 @@ export function SealProvider({ children }: { children: ReactNode }) {
       ...calculateDecay(state),
       hunger: clamp(state.hunger, 0, MAX_STAT_VALUE),
       happiness: clamp(state.happiness, 0, MAX_STAT_VALUE),
-      hygiene: clamp(state.hygiene, 0, MAX_STAT_VALUE),
+      cleanliness: clamp(state.cleanliness, 0, MAX_STAT_VALUE),
       lastUpdate: Date.now(),
     };
     setSealState(clampedState);
