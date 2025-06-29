@@ -13,8 +13,10 @@ const INITIAL_STATE: CleanGameState = {
 };
 
 function CleanGame() {
-  const { gameState, setGameState, endGame, resetGame } =
-    useMiniGame(INITIAL_STATE);
+  const { gameState, setGameState, endGame, resetGame } = useMiniGame(
+    "clean",
+    INITIAL_STATE
+  );
 
   useEffect(() => {
     setGameState((prev) => ({

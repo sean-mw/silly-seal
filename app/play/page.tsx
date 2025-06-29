@@ -17,8 +17,10 @@ const INITIAL_STATE: DepthGameState = {
 };
 
 function DepthGame() {
-  const { gameState, setGameState, endGame, resetGame } =
-    useMiniGame(INITIAL_STATE);
+  const { gameState, setGameState, endGame, resetGame } = useMiniGame(
+    "depth",
+    INITIAL_STATE
+  );
 
   useEffect(() => {
     const initializeGame = async () => {
@@ -95,7 +97,7 @@ function DepthGame() {
         }));
 
         endGame({
-          stat: "hunger",
+          stat: "happiness",
           value: GAME_CONFIG.SCORE_MULTIPLIER * gameState.score,
         });
       }

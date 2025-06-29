@@ -19,7 +19,7 @@ const INITIAL_STATE: FeedGameState = {
 
 function FeedGame() {
   const { gameState, setGameState, endGame, resetGame } =
-    useMiniGame<FeedGameState>(INITIAL_STATE);
+    useMiniGame<FeedGameState>("feed", INITIAL_STATE);
 
   useEffect(() => {
     setGameState((prev) => ({

@@ -5,9 +5,12 @@ import { useSeal } from "@/hooks/useSeal";
 import { GameReward, GameState } from "@/types/minigames/common";
 import usePersistedState from "./usePersistedState";
 
-export function useMiniGame<T extends GameState>(initialState: T) {
+export function useMiniGame<T extends GameState>(
+  name: string,
+  initialState: T
+) {
   const [gameState, setGameState] = usePersistedState<T>(
-    `${initialState.rewardStat}-minigame`,
+    `${name}-minigame`,
     initialState
   );
   const { sealState, setSealState } = useSeal();
