@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { SealState, useSeal } from "@/hooks/useSeal";
 import { GameState } from "@/types/minigames/common";
 import usePersistedState from "./usePersistedState";
@@ -36,6 +36,23 @@ export function useMiniGame<T extends GameState>(
     },
     [setGameState]
   );
+
+  useEffect(() => {
+    if (!gameState.isGameOver) return;
+
+    const lastPlayed = gameState.lastPlayedAt ?? 0;
+    const lastPlayedDate = new Date(lastPlayed);
+    const nowDate = new Date();
+
+    const playedToday =
+      lastPlayedDate.getFullYear() === nowDate.getFullYear() &&
+      lastPlayedDate.getMonth() === nowDate.getMonth() &&
+      lastPlayedDate.getDate() === nowDate.getDate();
+
+    if (!playedToday) {
+      resetGame(initialState);
+    }
+  }, [gameState.lastPlayedAt, gameState.isGameOver, initialState, resetGame]);
 
   return {
     gameState,

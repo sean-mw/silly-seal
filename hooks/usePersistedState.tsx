@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 function loadState<T>(key: string): T | undefined {
   if (typeof window === "undefined") return;
@@ -34,10 +34,14 @@ function usePersistedState<T>(
   key: string,
   initialState: T
 ): [T, (updater: SetStateAction<T>) => void] {
-  const [state, setState] = useState<T>(() => {
+  const [state, setState] = useState<T>(initialState);
+
+  useEffect(() => {
     const stored = loadState<T>(key);
-    return stored ?? initialState;
-  });
+    if (stored !== undefined) {
+      setState(stored);
+    }
+  }, [key]);
 
   const setPersistedState = useCallback(
     (updater: SetStateAction<T>) => {

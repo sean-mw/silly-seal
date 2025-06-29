@@ -1,6 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Button from "./Button";
 
 type StatusBarProps = {
@@ -11,15 +8,6 @@ type StatusBarProps = {
 };
 
 function StatusBar({ title, percent, buttonLabel, onClick }: StatusBarProps) {
-  const [hasMounted, setHasMounted] = useState(false);
-
-  useEffect(() => {
-    // TODO: find better way to handle SSR
-    setHasMounted(true);
-  }, []);
-
-  if (!hasMounted) return null;
-
   let color = "#8ac926";
   if (percent < 0.33) {
     color = "#ff595e";
