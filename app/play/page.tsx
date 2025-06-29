@@ -128,7 +128,7 @@ function DepthGame() {
         name: "Depth Guesser",
         description:
           "Guess whether the next species lives at a shallower or deeper depth!",
-        allowRestart: process.env.NODE_ENV === "development",
+        allowRestart: true,
       }}
       gameState={gameState}
       onRestart={handleRestart}

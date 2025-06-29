@@ -94,7 +94,7 @@ function FeedGame() {
       config={{
         name: "Feed Mini-Game",
         description: "Feed the seal by guessing the correct sequence of fish!",
-        allowRestart: process.env.NODE_ENV === "development",
+        allowRestart: true,
       }}
       gameState={gameState}
       onRestart={handleRestart}

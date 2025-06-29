@@ -37,7 +37,7 @@ function CleanGame() {
       config={{
         name: "Clean the Seal",
         description: "Clean the seal enclosure while avoiding rocks!",
-        allowRestart: process.env.NODE_ENV === "development",
+        allowRestart: true,
       }}
       gameState={gameState}
       onRestart={handleRestart}
