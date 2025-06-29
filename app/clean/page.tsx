@@ -13,17 +13,17 @@ const INITIAL_STATE: CleanGameState = {
 };
 
 function CleanGame() {
-  const { gameState, updateGameState, endGame, resetGame } = useMiniGame(
+  const { gameState, setGameState, endGame, resetGame } = useMiniGame(
     INITIAL_STATE,
     "hygiene"
   );
 
   useEffect(() => {
-    updateGameState((prev) => ({
+    setGameState((prev) => ({
       ...prev,
       grid: CleanGameEngine.initializeGrid(),
     }));
-  }, [updateGameState]);
+  }, [setGameState]);
 
   const handleRestart = () => {
     resetGame({
@@ -45,7 +45,7 @@ function CleanGame() {
       <div className="flex flex-col h-full items-center justify-center gap-4">
         <CellGrid
           gameState={gameState}
-          updateGameState={updateGameState}
+          updateGameState={setGameState}
           endGame={endGame}
         />
       </div>

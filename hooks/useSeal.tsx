@@ -1,12 +1,8 @@
 "use client";
+
 import { clamp } from "@/lib/utils";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, ReactNode } from "react";
+import usePersistedState from "./usePersistedState";
 
 export type SealState = {
   hunger: number;
@@ -15,10 +11,10 @@ export type SealState = {
   lastUpdate: number;
 };
 
-const STORAGE_KEY = "sealState";
 export const MAX_STAT_VALUE = 100;
 const INITIAL_STAT_VALUE = MAX_STAT_VALUE / 2;
 const DAILY_DECAY = MAX_STAT_VALUE / 3;
+const STORAGE_KEY = "sealState";
 
 const defaultState: SealState = {
   hunger: INITIAL_STAT_VALUE,
@@ -42,64 +38,46 @@ function calculateDecay(state: SealState): SealState {
   };
 }
 
-function loadState(): SealState {
-  if (typeof window === "undefined") return defaultState;
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    const state = stored ? JSON.parse(stored) : defaultState;
-    return calculateDecay(state);
-  } catch (error) {
-    console.error("Failed to parse seal state from localStorage:", error);
-    return defaultState;
-  }
-}
-
-function saveState(state: SealState): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch (error) {
-    console.error("Failed to save seal state to localStorage:", error);
-  }
-}
-
 type SealContextType = {
-  seal: SealState;
-  setSeal: (state: SealState) => void;
+  sealState: SealState;
+  setSealState: (state: SealState) => void;
 };
 
 const SealContext = createContext<SealContextType | null>(null);
 
 export function SealProvider({ children }: { children: ReactNode }) {
-  const [seal, setSealState] = useState<SealState>(defaultState);
+  const [sealState, setSealState] = usePersistedState<SealState>(
+    STORAGE_KEY,
+    defaultState
+  );
 
   useEffect(() => {
-    const loadedState = loadState();
-    setSealState(loadedState);
-  }, []);
+    if (typeof window === "undefined") return;
 
-  useEffect(() => {
+    setSealState((currentState) => calculateDecay(currentState));
+
     const interval = setInterval(() => {
       setSealState((currentState) => calculateDecay(currentState));
     }, 15 * 60 * 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [setSealState]);
 
-  const setSeal = (state: SealState) => {
-    const clampedState = {
+  const setSealStateClamped = (state: SealState) => {
+    const clampedState: SealState = {
       ...calculateDecay(state),
       hunger: clamp(state.hunger, 0, MAX_STAT_VALUE),
       happiness: clamp(state.happiness, 0, MAX_STAT_VALUE),
       hygiene: clamp(state.hygiene, 0, MAX_STAT_VALUE),
       lastUpdate: Date.now(),
     };
-    saveState(clampedState);
     setSealState(clampedState);
   };
 
   return (
-    <SealContext.Provider value={{ seal, setSeal }}>
+    <SealContext.Provider
+      value={{ sealState, setSealState: setSealStateClamped }}
+    >
       {children}
     </SealContext.Provider>
   );

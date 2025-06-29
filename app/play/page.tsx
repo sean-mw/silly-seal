@@ -17,7 +17,7 @@ const INITIAL_STATE: DepthGameState = {
 };
 
 function DepthGame() {
-  const { gameState, updateGameState, endGame, resetGame } = useMiniGame(
+  const { gameState, setGameState, endGame, resetGame } = useMiniGame(
     INITIAL_STATE,
     "happiness"
   );
@@ -32,7 +32,7 @@ function DepthGame() {
           firstIdx
         );
 
-        updateGameState((prev) => ({
+        setGameState((prev) => ({
           ...prev,
           speciesList: species,
           currentIdx: firstIdx,
@@ -41,7 +41,7 @@ function DepthGame() {
         }));
       } catch (error) {
         console.error("Failed to initialize game:", error);
-        updateGameState((prev) => ({
+        setGameState((prev) => ({
           ...prev,
           isLoading: false,
         }));
@@ -49,7 +49,7 @@ function DepthGame() {
     };
 
     initializeGame();
-  }, [updateGameState]);
+  }, [setGameState]);
 
   const handleGuess = (guess: "higher" | "lower") => {
     if (
@@ -71,7 +71,7 @@ function DepthGame() {
       nextDepth
     );
 
-    updateGameState((prev) => ({
+    setGameState((prev) => ({
       ...prev,
       showNextDepth: true,
     }));
@@ -83,7 +83,7 @@ function DepthGame() {
           gameState.nextIdx
         );
 
-        updateGameState((prev) => ({
+        setGameState((prev) => ({
           ...prev,
           score: prev.score + 1,
           currentIdx: gameState.nextIdx,
@@ -91,7 +91,7 @@ function DepthGame() {
           showNextDepth: false,
         }));
       } else {
-        updateGameState((prev) => ({
+        setGameState((prev) => ({
           ...prev,
           isGameOver: true,
         }));

@@ -10,7 +10,7 @@ export default function Home() {
   const router = useRouter();
   const statusContainerRef = useRef<HTMLDivElement>(null);
   const [sealSize, setSealSize] = useState(512);
-  const { seal } = useSeal();
+  const { sealState } = useSeal();
 
   useEffect(() => {
     const updateSealSize = () => {
@@ -51,7 +51,7 @@ export default function Home() {
       >
         <StatusBar
           title={"Hunger"}
-          percent={seal.hunger / 100}
+          percent={sealState.hunger / 100}
           buttonLabel={"Feed"}
           onClick={() => {
             router.push("/feed");
@@ -59,7 +59,7 @@ export default function Home() {
         />
         <StatusBar
           title={"Happiness"}
-          percent={seal.happiness / 100}
+          percent={sealState.happiness / 100}
           buttonLabel={"Play"}
           onClick={() => {
             router.push("/play");
@@ -67,7 +67,7 @@ export default function Home() {
         />
         <StatusBar
           title={"Hygiene"}
-          percent={seal.hygiene / 100}
+          percent={sealState.hygiene / 100}
           buttonLabel={"Clean"}
           onClick={() => {
             router.push("/clean");

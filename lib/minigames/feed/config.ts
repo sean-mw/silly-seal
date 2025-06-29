@@ -1,3 +1,5 @@
+import { MAX_STAT_VALUE } from "@/hooks/useSeal";
+
 export const GAME_CONFIG = {
   FISH_TYPES: ["anchovy", "clownfish", "crab", "pufferfish", "surgeonfish"],
   SEQUENCE_LENGTH: 4,
@@ -5,7 +7,7 @@ export const GAME_CONFIG = {
   CELL_SIZE: "w-[min(14vw,14vh,64px)] h-[min(14vw,14vh,64px)]",
   BUTTON_STYLE:
     "border-3 rounded flex items-center justify-center disabled:opacity-50",
-  STAT_REWARD: 50,
+  STAT_REWARD: MAX_STAT_VALUE / 2,
 };
 
 export const FEEDBACK_COLORS = {

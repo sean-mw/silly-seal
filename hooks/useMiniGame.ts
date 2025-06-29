@@ -1,41 +1,45 @@
-import { useState, useCallback } from "react";
+"use client";
+
+import { useCallback } from "react";
 import { SealState, useSeal } from "@/hooks/useSeal";
 import { GameState } from "@/types/minigames/common";
+import usePersistedState from "./usePersistedState";
 
 export function useMiniGame<T extends GameState>(
   initialState: T,
   relatedStat: keyof SealState
 ) {
-  const [gameState, setGameState] = useState<T>(initialState);
-  const { seal, setSeal } = useSeal();
-
-  const updateGameState = useCallback((updater: (prev: T) => T) => {
-    setGameState(updater);
-  }, []);
+  const [gameState, setGameState] = usePersistedState<T>(
+    `${relatedStat}-minigame`,
+    initialState
+  );
+  const { sealState, setSealState } = useSeal();
 
   const endGame = useCallback(
     (statReward: number) => {
-      setGameState((prev) => ({
-        ...prev,
+      setGameState((prevGameState) => ({
+        ...prevGameState,
         isGameOver: true,
         lastPlayedAt: Date.now(),
       }));
-
-      setSeal({
-        ...seal,
-        [relatedStat]: seal[relatedStat] + statReward,
+      setSealState({
+        ...sealState,
+        [relatedStat]: sealState[relatedStat] + statReward,
       });
     },
-    [relatedStat, seal, setSeal]
+    [relatedStat, sealState, setGameState, setSealState]
   );
 
-  const resetGame = useCallback((newInitialState: T) => {
-    setGameState(newInitialState);
-  }, []);
+  const resetGame = useCallback(
+    (newInitialState: T) => {
+      setGameState(newInitialState);
+    },
+    [setGameState]
+  );
 
   return {
     gameState,
-    updateGameState,
+    setGameState,
     endGame,
     resetGame,
   };

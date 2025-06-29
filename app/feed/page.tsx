@@ -18,22 +18,22 @@ const INITIAL_STATE: FeedGameState = {
 };
 
 function FeedGame() {
-  const { gameState, updateGameState, endGame, resetGame } =
+  const { gameState, setGameState, endGame, resetGame } =
     useMiniGame<FeedGameState>(INITIAL_STATE, "hunger");
 
   useEffect(() => {
-    updateGameState((prev) => ({
+    setGameState((prev) => ({
       ...prev,
       secret: FeedGameEngine.generateRandomSequence(),
     }));
-  }, [updateGameState]);
+  }, [setGameState]);
 
   const handleAddFish = (fish: string) => {
     if (
       !gameState.isGameOver &&
       gameState.currentGuess.length < GAME_CONFIG.SEQUENCE_LENGTH
     ) {
-      updateGameState((prev) => ({
+      setGameState((prev) => ({
         ...prev,
         currentGuess: [...prev.currentGuess, fish],
       }));
@@ -41,7 +41,7 @@ function FeedGame() {
   };
 
   const handleRemoveLastFish = () => {
-    updateGameState((prev) => ({
+    setGameState((prev) => ({
       ...prev,
       currentGuess: prev.currentGuess.slice(0, -1),
     }));
@@ -65,7 +65,7 @@ function FeedGame() {
     };
     const updatedGuesses = [...gameState.guesses, newGuess];
 
-    updateGameState((prev) => ({
+    setGameState((prev) => ({
       ...prev,
       guesses: updatedGuesses,
       currentGuess: [],
