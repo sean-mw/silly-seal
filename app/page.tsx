@@ -56,6 +56,7 @@ export default function Home() {
           onClick={() => {
             router.push("/play");
           }}
+          className="border-t-3 border-black"
         />
         <StatusBar
           title={"Hunger"}
@@ -64,6 +65,7 @@ export default function Home() {
           onClick={() => {
             router.push("/feed");
           }}
+          className="border-t-3 border-black"
         />
         <StatusBar
           title={"Cleanliness"}
@@ -72,6 +74,7 @@ export default function Home() {
           onClick={() => {
             router.push("/clean");
           }}
+          className="border-t-3 border-black"
         />
       </div>
     </div>

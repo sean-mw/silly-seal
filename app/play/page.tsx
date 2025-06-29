@@ -10,7 +10,6 @@ import GameContent from "@/components/minigames/depth/GameContent";
 
 const INITIAL_STATE: DepthGameState = {
   isGameOver: false,
-  rewardStat: "happiness",
   score: 0,
   speciesList: [],
   showNextDepth: false,
@@ -95,7 +94,10 @@ function DepthGame() {
           isGameOver: true,
         }));
 
-        endGame(GAME_CONFIG.SCORE_MULTIPLIER * gameState.score);
+        endGame({
+          stat: "hunger",
+          value: GAME_CONFIG.SCORE_MULTIPLIER * gameState.score,
+        });
       }
     }, GAME_CONFIG.REVEAL_DELAY);
   };

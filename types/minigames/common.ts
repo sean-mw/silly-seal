@@ -2,10 +2,15 @@ import { SealState } from "@/hooks/useSeal";
 
 export interface GameState {
   isGameOver: boolean;
-  rewardStat: keyof SealState;
-  rewardValue?: number;
+  reward?: GameReward;
   lastPlayedAt?: number;
   [key: string]: unknown;
+}
+
+export interface GameReward {
+  stat: keyof SealState;
+  value: number;
+  prevValue?: number;
 }
 
 export interface MiniGameConfig {

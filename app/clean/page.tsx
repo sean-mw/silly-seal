@@ -9,7 +9,6 @@ import { useMiniGame } from "@/hooks/useMiniGame";
 
 const INITIAL_STATE: CleanGameState = {
   isGameOver: false,
-  rewardStat: "cleanliness",
   grid: [],
 };
 

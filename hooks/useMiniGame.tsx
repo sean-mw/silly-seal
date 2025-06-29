@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from "react";
 import { useSeal } from "@/hooks/useSeal";
-import { GameState } from "@/types/minigames/common";
+import { GameReward, GameState } from "@/types/minigames/common";
 import usePersistedState from "./usePersistedState";
 
 export function useMiniGame<T extends GameState>(initialState: T) {
@@ -13,19 +13,22 @@ export function useMiniGame<T extends GameState>(initialState: T) {
   const { sealState, setSealState } = useSeal();
 
   const endGame = useCallback(
-    (rewardValue: number) => {
+    (reward: GameReward) => {
       setGameState((prevGameState) => ({
         ...prevGameState,
         isGameOver: true,
-        rewardValue,
+        reward: {
+          ...reward,
+          prevValue: sealState[reward.stat],
+        },
         lastPlayedAt: Date.now(),
       }));
       setSealState({
         ...sealState,
-        [gameState.rewardStat]: sealState[gameState.rewardStat] + rewardValue,
+        [reward.stat]: sealState[reward.stat] + reward.value,
       });
     },
-    [gameState.rewardStat, sealState, setGameState, setSealState]
+    [sealState, setGameState, setSealState]
   );
 
   const resetGame = useCallback(

@@ -11,7 +11,6 @@ import GameControls from "@/components/minigames/feed/GameControls";
 
 const INITIAL_STATE: FeedGameState = {
   isGameOver: false,
-  rewardStat: "hunger",
   secret: [],
   currentGuess: [],
   guesses: [],
@@ -76,7 +75,10 @@ function FeedGame() {
     const isGameWon = FeedGameEngine.isGameWon(feedback);
     const isGameOver = FeedGameEngine.isGameOver(updatedGuesses, isGameWon);
     if (isGameOver) {
-      endGame(GAME_CONFIG.STAT_REWARD);
+      endGame({
+        stat: "hunger",
+        value: GAME_CONFIG.STAT_REWARD,
+      });
     }
   };
 

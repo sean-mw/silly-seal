@@ -2,17 +2,21 @@ import { GAME_CONFIG } from "@/lib/minigames/clean/config";
 import { CleanGameEngine } from "@/lib/minigames/clean/engine";
 import CellButton from "./CellButton";
 import { Cell, CleanGameState } from "@/types/minigames/clean";
+import { GameReward } from "@/types/minigames/common";
 
 interface CellGridProps {
   gameState: CleanGameState;
   updateGameState: (update: (prev: CleanGameState) => CleanGameState) => void;
-  endGame: (statReward: number) => void;
+  endGame: (reward: GameReward) => void;
 }
 
 function CellGrid({ gameState, updateGameState, endGame }: CellGridProps) {
   const checkVictory = (grid: Cell[][]) => {
     if (!CleanGameEngine.isCleared(grid)) return;
-    endGame(GAME_CONFIG.STAT_REWARD);
+    endGame({
+      stat: "cleanliness",
+      value: GAME_CONFIG.STAT_REWARD,
+    });
   };
 
   const handleLeftClick = (x: number, y: number) => {
@@ -23,7 +27,10 @@ function CellGrid({ gameState, updateGameState, endGame }: CellGridProps) {
     const cell = newGrid[y][x];
     if (cell.revealed || cell.flagged) return;
     if (cell.hasRock) {
-      endGame(0);
+      endGame({
+        stat: "cleanliness",
+        value: 0,
+      });
     } else {
       CleanGameEngine.revealEmptyCells(newGrid, x, y);
     }
