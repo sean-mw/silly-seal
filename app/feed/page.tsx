@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useEffect } from "react";
 import { MiniGame } from "@/components/minigames/MiniGame";
 import { useMiniGame } from "@/hooks/useMiniGame";
 import { GuessWithFeedback, FeedGameState } from "@/types/minigames/feed";
@@ -11,7 +10,7 @@ import GameControls from "@/components/minigames/feed/GameControls";
 
 const INITIAL_STATE: FeedGameState = {
   isGameOver: false,
-  secret: [],
+  secret: FeedGameEngine.generateRandomSequence(),
   currentGuess: [],
   guesses: [],
   keyboardColors: {},
@@ -20,13 +19,6 @@ const INITIAL_STATE: FeedGameState = {
 function FeedGame() {
   const { gameState, setGameState, endGame, resetGame } =
     useMiniGame<FeedGameState>("feed", INITIAL_STATE);
-
-  useEffect(() => {
-    setGameState((prev) => ({
-      ...prev,
-      secret: FeedGameEngine.generateRandomSequence(),
-    }));
-  }, [setGameState]);
 
   const handleAddFish = (fish: string) => {
     if (
