@@ -1,12 +1,11 @@
 import { GAME_CONFIG } from "@/lib/minigames/feed/config";
 import FishButton from "./FishButton";
 import ActionButton from "./ActionButton";
-import { Delete, RotateCcw } from "lucide-react";
+import { Delete } from "lucide-react";
 
 interface GameControlsProps {
   onAddFish: (fish: string) => void;
   onSubmitGuess: () => void;
-  onRestart: () => void;
   onRemoveLastFish: () => void;
   isGameOver: boolean;
   currentGuessLength: number;
@@ -16,7 +15,6 @@ interface GameControlsProps {
 function GameControls({
   onAddFish,
   onSubmitGuess,
-  onRestart,
   onRemoveLastFish,
   isGameOver,
   currentGuessLength,
@@ -44,11 +42,6 @@ function GameControls({
         <ActionButton onClick={onSubmitGuess} disabled={!canSubmit}>
           <span className="font-bold text-sm">FEED</span>
         </ActionButton>
-
-        <ActionButton onClick={onRestart}>
-          <RotateCcw className="w-3/4 h-3/4" />
-        </ActionButton>
-
         <ActionButton onClick={onRemoveLastFish} disabled={!canDelete}>
           <Delete className="w-3/4 h-3/4" />
         </ActionButton>

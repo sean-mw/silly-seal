@@ -1,55 +1,36 @@
 "use client";
 
-import React, { useEffect } from "react";
 import { MiniGame } from "@/components/minigames/MiniGame";
 import { useMiniGame } from "@/hooks/useMiniGame";
 import { DepthGameState } from "@/types/minigames/depth";
 import { DepthGameEngine } from "@/lib/minigames/depth/engine";
 import { GAME_CONFIG } from "@/lib/minigames/depth/config";
 import GameContent from "@/components/minigames/depth/GameContent";
+import { GameReward } from "@/types/minigames/common";
 
-const INITIAL_STATE: DepthGameState = {
-  isGameOver: false,
-  score: 0,
-  speciesList: [],
-  showNextDepth: false,
-  isLoading: true,
+const generateInitialGameState = async (): Promise<DepthGameState> => {
+  const speciesList = await DepthGameEngine.loadSpecies();
+  const currentIdx = DepthGameEngine.getRandomIndex(speciesList.length);
+  const nextIdx = DepthGameEngine.getRandomIndex(
+    speciesList.length,
+    currentIdx
+  );
+  return {
+    isGameOver: false,
+    score: 0,
+    showNextDepth: false,
+    speciesList,
+    currentIdx,
+    nextIdx,
+  };
 };
 
 function DepthGame() {
-  const { gameState, setGameState, endGame, resetGame } = useMiniGame(
-    "depth",
-    INITIAL_STATE
-  );
+  const { gameState, setGameState, endGame, resetGame } =
+    useMiniGame<DepthGameState>("depth", generateInitialGameState);
 
-  useEffect(() => {
-    const initializeGame = async () => {
-      try {
-        const species = await DepthGameEngine.loadSpecies();
-        const firstIdx = DepthGameEngine.getRandomIndex(species.length);
-        const secondIdx = DepthGameEngine.getRandomIndex(
-          species.length,
-          firstIdx
-        );
-
-        setGameState((prev) => ({
-          ...prev,
-          speciesList: species,
-          currentIdx: firstIdx,
-          nextIdx: secondIdx,
-          isLoading: false,
-        }));
-      } catch (error) {
-        console.error("Failed to initialize game:", error);
-        setGameState((prev) => ({
-          ...prev,
-          isLoading: false,
-        }));
-      }
-    };
-
-    initializeGame();
-  }, [setGameState]);
+  // TODO: better loading animation
+  if (!gameState) return <>Loading...</>;
 
   const handleGuess = (guess: "higher" | "lower") => {
     if (
@@ -72,54 +53,37 @@ function DepthGame() {
     );
 
     setGameState((prev) => ({
-      ...prev,
+      ...prev!,
       showNextDepth: true,
     }));
 
     setTimeout(() => {
-      if (isCorrect) {
-        const newNextIdx = DepthGameEngine.getRandomIndex(
-          gameState.speciesList.length,
-          gameState.nextIdx
-        );
+      let reward: GameReward | undefined;
+      setGameState((prev) => {
+        if (!prev) return prev;
 
-        setGameState((prev) => ({
-          ...prev,
-          score: prev.score + 1,
-          currentIdx: gameState.nextIdx,
-          nextIdx: newNextIdx,
-          showNextDepth: false,
-        }));
-      } else {
-        setGameState((prev) => ({
-          ...prev,
-          isGameOver: true,
-        }));
-
-        endGame({
-          stat: "happiness",
-          value: GAME_CONFIG.SCORE_MULTIPLIER * gameState.score,
-        });
-      }
+        if (isCorrect) {
+          const newNextIdx = DepthGameEngine.getRandomIndex(
+            prev.speciesList.length,
+            prev.nextIdx
+          );
+          return {
+            ...prev,
+            score: prev.score + 1,
+            currentIdx: prev.nextIdx,
+            nextIdx: newNextIdx,
+            showNextDepth: false,
+          };
+        } else {
+          reward = {
+            stat: "happiness",
+            value: GAME_CONFIG.SCORE_MULTIPLIER * prev.score,
+          };
+          return { ...prev, isGameOver: true };
+        }
+      });
+      if (reward) endGame(reward);
     }, GAME_CONFIG.REVEAL_DELAY);
-  };
-
-  const handleRestart = async () => {
-    const firstIdx = DepthGameEngine.getRandomIndex(
-      gameState.speciesList.length
-    );
-    const secondIdx = DepthGameEngine.getRandomIndex(
-      gameState.speciesList.length,
-      firstIdx
-    );
-
-    resetGame({
-      ...INITIAL_STATE,
-      speciesList: gameState.speciesList,
-      currentIdx: firstIdx,
-      nextIdx: secondIdx,
-      isLoading: false,
-    });
   };
 
   return (
@@ -131,7 +95,7 @@ function DepthGame() {
         allowRestart: true,
       }}
       gameState={gameState}
-      onRestart={handleRestart}
+      onRestart={resetGame}
     >
       <GameContent gameState={gameState} onGuess={handleGuess} />
     </MiniGame>

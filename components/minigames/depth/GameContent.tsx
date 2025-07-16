@@ -8,12 +8,13 @@ interface GameContentProps {
 }
 
 export default function GameContent({ gameState, onGuess }: GameContentProps) {
-  if (gameState.isLoading || !gameState.speciesList.length) {
+  if (
+    !gameState ||
+    !gameState.speciesList.length ||
+    gameState.currentIdx == undefined ||
+    gameState.nextIdx == undefined
+  ) {
     return <div className="text-center pt-8">Loading game...</div>;
-  }
-
-  if (gameState.currentIdx === undefined || gameState.nextIdx === undefined) {
-    return <div className="text-center pt-8">Setting up game...</div>;
   }
 
   const currentSpecies = gameState.speciesList[gameState.currentIdx];

@@ -7,42 +7,51 @@ import usePersistedState from "./usePersistedState";
 
 export function useMiniGame<T extends GameState>(
   name: string,
-  initialState: T
+  generateInitialGameState: () => Promise<T>
 ) {
-  const [gameState, setGameState] = usePersistedState<T>(
-    `${name}-minigame`,
-    initialState
-  );
+  const [gameState, setGameState, isGameStateLoaded] = usePersistedState<
+    T | undefined
+  >(`${name}-minigame`, undefined);
   const { sealState, setSealState } = useSeal();
+
+  const initializeGameState = useCallback(async () => {
+    const state = await generateInitialGameState();
+    setGameState(state);
+  }, [generateInitialGameState, setGameState]);
+
+  useEffect(() => {
+    if (isGameStateLoaded && gameState === undefined) {
+      initializeGameState();
+    }
+  }, [gameState, initializeGameState, isGameStateLoaded]);
 
   const endGame = useCallback(
     (reward: GameReward) => {
-      setGameState((prevGameState) => ({
-        ...prevGameState,
+      if (gameState === undefined) return;
+      setGameState({
+        ...gameState,
         isGameOver: true,
         reward: {
           ...reward,
           prevValue: sealState[reward.stat],
         },
         lastPlayedAt: Date.now(),
-      }));
+      });
       setSealState({
         ...sealState,
         [reward.stat]: sealState[reward.stat] + reward.value,
       });
     },
-    [sealState, setGameState, setSealState]
+    [gameState, sealState, setGameState, setSealState]
   );
 
-  const resetGame = useCallback(
-    (newInitialState: T) => {
-      setGameState(newInitialState);
-    },
-    [setGameState]
-  );
+  const resetGame = useCallback(async () => {
+    const newInitialGameState = await generateInitialGameState();
+    setGameState(newInitialGameState);
+  }, [generateInitialGameState, setGameState]);
 
   useEffect(() => {
-    if (!gameState.isGameOver) return;
+    if (gameState === undefined || !gameState.isGameOver) return;
 
     const lastPlayed = gameState.lastPlayedAt ?? 0;
     const lastPlayedDate = new Date(lastPlayed);
@@ -54,9 +63,9 @@ export function useMiniGame<T extends GameState>(
       lastPlayedDate.getDate() === nowDate.getDate();
 
     if (!playedToday) {
-      resetGame(initialState);
+      resetGame();
     }
-  }, [gameState.lastPlayedAt, gameState.isGameOver, initialState, resetGame]);
+  }, [gameState, resetGame]);
 
   return {
     gameState,

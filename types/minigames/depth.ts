@@ -9,11 +9,9 @@ export interface Species {
 }
 
 export interface DepthGameState extends GameState {
-  isGameOver: boolean;
   score: number;
   speciesList: Species[];
+  showNextDepth: boolean;
   currentIdx?: number;
   nextIdx?: number;
-  showNextDepth: boolean;
-  isLoading: boolean;
 }

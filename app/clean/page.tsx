@@ -1,36 +1,24 @@
 "use client";
 
-import { useEffect } from "react";
 import { CleanGameEngine } from "@/lib/minigames/clean/engine";
 import { CleanGameState } from "@/types/minigames/clean";
 import CellGrid from "@/components/minigames/clean/CellGrid";
 import { MiniGame } from "@/components/minigames/MiniGame";
 import { useMiniGame } from "@/hooks/useMiniGame";
 
-const INITIAL_STATE: CleanGameState = {
-  isGameOver: false,
-  grid: [],
+const generateInitialGameState = async (): Promise<CleanGameState> => {
+  return {
+    isGameOver: false,
+    grid: CleanGameEngine.initializeGrid(),
+  };
 };
 
 function CleanGame() {
-  const { gameState, setGameState, endGame, resetGame } = useMiniGame(
-    "clean",
-    INITIAL_STATE
-  );
+  const { gameState, setGameState, endGame, resetGame } =
+    useMiniGame<CleanGameState>("clean", generateInitialGameState);
 
-  useEffect(() => {
-    setGameState((prev) => ({
-      ...prev,
-      grid: CleanGameEngine.initializeGrid(),
-    }));
-  }, [setGameState]);
-
-  const handleRestart = () => {
-    resetGame({
-      ...INITIAL_STATE,
-      grid: CleanGameEngine.initializeGrid(),
-    });
-  };
+  // TODO: better loading animation
+  if (!gameState) return <>Loading...</>;
 
   return (
     <MiniGame
@@ -40,7 +28,7 @@ function CleanGame() {
         allowRestart: true,
       }}
       gameState={gameState}
-      onRestart={handleRestart}
+      onRestart={resetGame}
     >
       <div className="flex flex-col h-full items-center justify-center gap-4">
         <CellGrid

@@ -6,7 +6,9 @@ import { GameReward } from "@/types/minigames/common";
 
 interface CellGridProps {
   gameState: CleanGameState;
-  updateGameState: (update: (prev: CleanGameState) => CleanGameState) => void;
+  updateGameState: (
+    update: (prev: CleanGameState | undefined) => CleanGameState | undefined
+  ) => void;
   endGame: (reward: GameReward) => void;
 }
 
@@ -20,7 +22,7 @@ function CellGrid({ gameState, updateGameState, endGame }: CellGridProps) {
   };
 
   const handleLeftClick = (x: number, y: number) => {
-    if (gameState.isGameOver || gameState.isVictory) return;
+    if (gameState.isGameOver) return;
     const newGrid = gameState.grid.map((row) =>
       row.map((cell) => ({ ...cell }))
     );
@@ -35,7 +37,7 @@ function CellGrid({ gameState, updateGameState, endGame }: CellGridProps) {
       CleanGameEngine.revealEmptyCells(newGrid, x, y);
     }
 
-    updateGameState((prev) => ({ ...prev, grid: newGrid }));
+    updateGameState((prev) => ({ ...prev!, grid: newGrid }));
     checkVictory(newGrid);
   };
 
@@ -45,14 +47,14 @@ function CellGrid({ gameState, updateGameState, endGame }: CellGridProps) {
     y: number
   ) => {
     e.preventDefault();
-    if (gameState.isGameOver || gameState.isVictory) return;
+    if (gameState.isGameOver) return;
     const newGrid = gameState.grid.map((row) =>
       row.map((cell) => ({ ...cell }))
     );
     const cell = newGrid[y][x];
     if (cell.revealed) return;
     cell.flagged = !cell.flagged;
-    updateGameState((prev) => ({ ...prev, grid: newGrid }));
+    updateGameState((prev) => ({ ...prev!, grid: newGrid }));
   };
 
   return (

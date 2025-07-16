@@ -8,17 +8,22 @@ import { GAME_CONFIG } from "@/lib/minigames/feed/config";
 import GameGrid from "@/components/minigames/feed/GameGrid";
 import GameControls from "@/components/minigames/feed/GameControls";
 
-const INITIAL_STATE: FeedGameState = {
-  isGameOver: false,
-  secret: FeedGameEngine.generateRandomSequence(),
-  currentGuess: [],
-  guesses: [],
-  keyboardColors: {},
+const generateInitialGameState = async (): Promise<FeedGameState> => {
+  return {
+    isGameOver: false,
+    secret: FeedGameEngine.generateRandomSequence(),
+    currentGuess: [],
+    guesses: [],
+    keyboardColors: {},
+  };
 };
 
 function FeedGame() {
   const { gameState, setGameState, endGame, resetGame } =
-    useMiniGame<FeedGameState>("feed", INITIAL_STATE);
+    useMiniGame<FeedGameState>("feed", generateInitialGameState);
+
+  // TODO: better loading animation
+  if (!gameState) return <>Loading...</>;
 
   const handleAddFish = (fish: string) => {
     if (
@@ -26,16 +31,16 @@ function FeedGame() {
       gameState.currentGuess.length < GAME_CONFIG.SEQUENCE_LENGTH
     ) {
       setGameState((prev) => ({
-        ...prev,
-        currentGuess: [...prev.currentGuess, fish],
+        ...prev!,
+        currentGuess: [...prev!.currentGuess, fish],
       }));
     }
   };
 
   const handleRemoveLastFish = () => {
     setGameState((prev) => ({
-      ...prev,
-      currentGuess: prev.currentGuess.slice(0, -1),
+      ...prev!,
+      currentGuess: prev!.currentGuess.slice(0, -1),
     }));
   };
 
@@ -58,7 +63,7 @@ function FeedGame() {
     const updatedGuesses = [...gameState.guesses, newGuess];
 
     setGameState((prev) => ({
-      ...prev,
+      ...prev!,
       guesses: updatedGuesses,
       currentGuess: [],
       keyboardColors: FeedGameEngine.computeKeyboardColors(updatedGuesses),
@@ -74,13 +79,6 @@ function FeedGame() {
     }
   };
 
-  const handleRestart = () => {
-    resetGame({
-      ...INITIAL_STATE,
-      secret: FeedGameEngine.generateRandomSequence(),
-    });
-  };
-
   return (
     <MiniGame
       config={{
@@ -89,7 +87,7 @@ function FeedGame() {
         allowRestart: true,
       }}
       gameState={gameState}
-      onRestart={handleRestart}
+      onRestart={resetGame}
     >
       <GameGrid
         guesses={gameState.guesses}
@@ -99,7 +97,6 @@ function FeedGame() {
       <GameControls
         onAddFish={handleAddFish}
         onSubmitGuess={handleSubmitGuess}
-        onRestart={handleRestart}
         onRemoveLastFish={handleRemoveLastFish}
         isGameOver={gameState.isGameOver}
         currentGuessLength={gameState.currentGuess.length}

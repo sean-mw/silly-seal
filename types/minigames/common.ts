@@ -4,7 +4,6 @@ export interface GameState {
   isGameOver: boolean;
   reward?: GameReward;
   lastPlayedAt?: number;
-  [key: string]: unknown;
 }
 
 export interface GameReward {

@@ -33,14 +33,16 @@ type SetStateAction<T> = T | ((prev: T) => T);
 function usePersistedState<T>(
   key: string,
   initialState: T
-): [T, (updater: SetStateAction<T>) => void] {
+): [T, (updater: SetStateAction<T>) => void, boolean] {
   const [state, setState] = useState<T>(initialState);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     const stored = loadState<T>(key);
     if (stored !== undefined) {
       setState(stored);
     }
+    setIsLoaded(true);
   }, [key]);
 
   const setPersistedState = useCallback(
@@ -57,7 +59,7 @@ function usePersistedState<T>(
     [key]
   );
 
-  return [state, setPersistedState];
+  return [state, setPersistedState, isLoaded];
 }
 
 export default usePersistedState;
