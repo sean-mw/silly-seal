@@ -4,16 +4,22 @@ import { DepthGameState } from "@/types/minigames/depth";
 
 interface GameContentProps {
   gameState: DepthGameState;
+  showNextDepth: boolean;
   onGuess: (guess: "higher" | "lower") => void;
 }
 
-export default function GameContent({ gameState, onGuess }: GameContentProps) {
+export default function GameContent({
+  gameState,
+  showNextDepth,
+  onGuess,
+}: GameContentProps) {
   if (
     !gameState ||
     !gameState.speciesList.length ||
     gameState.currentIdx == undefined ||
     gameState.nextIdx == undefined
   ) {
+    // TODO: better loading animation
     return <div className="text-center pt-8">Loading game...</div>;
   }
 
@@ -25,9 +31,9 @@ export default function GameContent({ gameState, onGuess }: GameContentProps) {
       <SpeciesCard species={currentSpecies} showDepth />
       <SpeciesCard
         species={nextSpecies}
-        showDepth={gameState.showNextDepth}
+        showDepth={showNextDepth}
         onGuess={onGuess}
-        disabled={gameState.showNextDepth || gameState.isGameOver}
+        disabled={showNextDepth || gameState.isGameOver}
       />
     </div>
   );

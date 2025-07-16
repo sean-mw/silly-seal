@@ -7,6 +7,7 @@ import { DepthGameEngine } from "@/lib/minigames/depth/engine";
 import { GAME_CONFIG } from "@/lib/minigames/depth/config";
 import GameContent from "@/components/minigames/depth/GameContent";
 import { GameReward } from "@/types/minigames/common";
+import { useState } from "react";
 
 const generateInitialGameState = async (): Promise<DepthGameState> => {
   const speciesList = await DepthGameEngine.loadSpecies();
@@ -18,7 +19,6 @@ const generateInitialGameState = async (): Promise<DepthGameState> => {
   return {
     isGameOver: false,
     score: 0,
-    showNextDepth: false,
     speciesList,
     currentIdx,
     nextIdx,
@@ -28,6 +28,7 @@ const generateInitialGameState = async (): Promise<DepthGameState> => {
 function DepthGame() {
   const { gameState, setGameState, endGame, resetGame } =
     useMiniGame<DepthGameState>("depth", generateInitialGameState);
+  const [showNextDepth, setShowNextDepth] = useState(false);
 
   // TODO: better loading animation
   if (!gameState) return <>Loading...</>;
@@ -37,7 +38,7 @@ function DepthGame() {
       gameState.currentIdx === undefined ||
       gameState.nextIdx === undefined ||
       gameState.isGameOver ||
-      gameState.showNextDepth
+      showNextDepth
     ) {
       return;
     }
@@ -52,10 +53,7 @@ function DepthGame() {
       nextDepth
     );
 
-    setGameState((prev) => ({
-      ...prev!,
-      showNextDepth: true,
-    }));
+    setShowNextDepth(true);
 
     setTimeout(() => {
       let reward: GameReward | undefined;
@@ -72,7 +70,6 @@ function DepthGame() {
             score: prev.score + 1,
             currentIdx: prev.nextIdx,
             nextIdx: newNextIdx,
-            showNextDepth: false,
           };
         } else {
           reward = {
@@ -82,6 +79,7 @@ function DepthGame() {
           return { ...prev, isGameOver: true };
         }
       });
+      setShowNextDepth(false);
       if (reward) endGame(reward);
     }, GAME_CONFIG.REVEAL_DELAY);
   };
@@ -97,7 +95,11 @@ function DepthGame() {
       gameState={gameState}
       onRestart={resetGame}
     >
-      <GameContent gameState={gameState} onGuess={handleGuess} />
+      <GameContent
+        gameState={gameState}
+        showNextDepth={showNextDepth}
+        onGuess={handleGuess}
+      />
     </MiniGame>
   );
 }

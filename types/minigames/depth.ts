@@ -11,7 +11,6 @@ export interface Species {
 export interface DepthGameState extends GameState {
   score: number;
   speciesList: Species[];
-  showNextDepth: boolean;
   currentIdx?: number;
   nextIdx?: number;
 }
