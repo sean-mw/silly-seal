@@ -11,6 +11,8 @@ export default function Seal({ size }: SealProps) {
       style={{
         width: `${size}px`,
         height: `${size}px`,
+        minWidth: "150px",
+        minHeight: "150px",
       }}
     >
       <Image
