@@ -29,7 +29,9 @@ const generateInitialGameState = async (): Promise<DepthGameState> => {
 function DepthGame() {
   const { gameState, setGameState, endGame, resetGame } =
     useMiniGame<DepthGameState>("depth", generateInitialGameState);
-  const [showNextDepth, setShowNextDepth] = useState(false);
+  const [guessResult, setGuessResult] = useState<
+    "correct" | "incorrect" | undefined
+  >();
 
   // TODO: better loading animation
   if (!gameState) return <>Loading...</>;
@@ -39,7 +41,7 @@ function DepthGame() {
       gameState.currentIdx === undefined ||
       gameState.nextIdx === undefined ||
       gameState.isGameOver ||
-      showNextDepth
+      guessResult !== undefined
     ) {
       return;
     }
@@ -54,7 +56,7 @@ function DepthGame() {
       nextDepth
     );
 
-    setShowNextDepth(true);
+    setGuessResult(isCorrect ? "correct" : "incorrect");
 
     setTimeout(() => {
       let reward: GameReward | undefined;
@@ -80,7 +82,7 @@ function DepthGame() {
           return { ...prev, isGameOver: true };
         }
       });
-      setShowNextDepth(false);
+      setGuessResult(undefined);
       if (reward) endGame(reward);
     }, GAME_CONFIG.REVEAL_DELAY);
   };
@@ -98,7 +100,7 @@ function DepthGame() {
     >
       <GameContent
         gameState={gameState}
-        showNextDepth={showNextDepth}
+        guessResult={guessResult}
         onGuess={handleGuess}
       />
     </MiniGame>
