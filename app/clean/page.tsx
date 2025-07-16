@@ -9,6 +9,7 @@ import { useMiniGame } from "@/hooks/useMiniGame";
 const generateInitialGameState = async (): Promise<CleanGameState> => {
   return {
     isGameOver: false,
+    createdAt: Date.now(),
     grid: CleanGameEngine.initializeGrid(),
   };
 };

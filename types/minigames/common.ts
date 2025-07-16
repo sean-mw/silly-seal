@@ -3,7 +3,7 @@ import { SealState } from "@/hooks/useSeal";
 export interface GameState {
   isGameOver: boolean;
   reward?: GameReward;
-  lastPlayedAt?: number;
+  createdAt: number;
 }
 
 export interface GameReward {

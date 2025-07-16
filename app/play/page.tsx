@@ -18,6 +18,7 @@ const generateInitialGameState = async (): Promise<DepthGameState> => {
   );
   return {
     isGameOver: false,
+    createdAt: Date.now(),
     score: 0,
     speciesList,
     currentIdx,

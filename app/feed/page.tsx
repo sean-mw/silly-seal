@@ -11,6 +11,7 @@ import GameControls from "@/components/minigames/feed/GameControls";
 const generateInitialGameState = async (): Promise<FeedGameState> => {
   return {
     isGameOver: false,
+    createdAt: Date.now(),
     secret: FeedGameEngine.generateRandomSequence(),
     currentGuess: [],
     guesses: [],

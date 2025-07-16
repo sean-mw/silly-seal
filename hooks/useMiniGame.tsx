@@ -35,7 +35,6 @@ export function useMiniGame<T extends GameState>(
           ...reward,
           prevValue: sealState[reward.stat],
         },
-        lastPlayedAt: Date.now(),
       });
       setSealState({
         ...sealState,
@@ -53,16 +52,16 @@ export function useMiniGame<T extends GameState>(
   useEffect(() => {
     if (gameState === undefined || !gameState.isGameOver) return;
 
-    const lastPlayed = gameState.lastPlayedAt ?? 0;
-    const lastPlayedDate = new Date(lastPlayed);
+    const createdAt = gameState.createdAt ?? 0;
+    const createdAtDate = new Date(createdAt);
     const nowDate = new Date();
 
-    const playedToday =
-      lastPlayedDate.getFullYear() === nowDate.getFullYear() &&
-      lastPlayedDate.getMonth() === nowDate.getMonth() &&
-      lastPlayedDate.getDate() === nowDate.getDate();
+    const createdToday =
+      createdAtDate.getFullYear() === nowDate.getFullYear() &&
+      createdAtDate.getMonth() === nowDate.getMonth() &&
+      createdAtDate.getDate() === nowDate.getDate();
 
-    if (!playedToday) {
+    if (!createdToday) {
       resetGame();
     }
   }, [gameState, resetGame]);
