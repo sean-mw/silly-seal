@@ -3,7 +3,7 @@ import { CleanGameEngine } from "@/lib/minigames/clean/engine";
 import CellButton from "./CellButton";
 import { Cell, CleanGameState } from "@/types/minigames/clean";
 import { GameReward } from "@/types/minigames/common";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import GuessFeedback from "../../ResultFeedback";
 
 interface CellGridProps {
@@ -21,20 +21,16 @@ function CellGrid({ gameState, updateGameState, endGame }: CellGridProps) {
   >(undefined);
   const [shakeAnimation, setShakeAnimation] = useState(false);
 
-  useEffect(() => {
-    if (!showRocks) return;
-    setShakeAnimation(true);
-    setTimeout(() => setShakeAnimation(false), 1000);
-  }, [showRocks]);
-
   const checkVictory = (grid: Cell[][]) => {
     if (!CleanGameEngine.isCleared(grid)) return;
+    setShowRocks(true);
     setGameResult("correct");
     setTimeout(() => {
       endGame({
         stat: "cleanliness",
         value: GAME_CONFIG.STAT_REWARD,
       });
+      setShowRocks(false);
       setGameResult(undefined);
     }, 1500);
   };
@@ -49,6 +45,7 @@ function CellGrid({ gameState, updateGameState, endGame }: CellGridProps) {
     if (cell.hasRock) {
       setShowRocks(true);
       setGameResult("incorrect");
+      setShakeAnimation(true);
       setTimeout(() => {
         endGame({
           stat: "cleanliness",
@@ -56,6 +53,7 @@ function CellGrid({ gameState, updateGameState, endGame }: CellGridProps) {
         });
         setShowRocks(false);
         setGameResult(undefined);
+        setShakeAnimation(false);
       }, 1500);
     } else {
       CleanGameEngine.revealEmptyCells(newGrid, x, y);
