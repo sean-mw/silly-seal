@@ -12,8 +12,7 @@ export async function GET() {
         occurrence_count,
         image_urls
       FROM species
-      ORDER BY RANDOM()
-      LIMIT 100;
+      WHERE occurrence_count > 100;
     `;
 
     return NextResponse.json(rows);
