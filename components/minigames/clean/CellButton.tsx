@@ -3,17 +3,19 @@ import { Cell } from "@/types/minigames/clean";
 import Image from "next/image";
 import { useRef } from "react";
 
+interface CellButtonProps {
+  cell: Cell;
+  onLeftClick: () => void;
+  onRightClick: (e: React.MouseEvent | React.TouchEvent) => void;
+  showRock: boolean;
+}
+
 function CellButton({
   cell,
   onLeftClick,
   onRightClick,
-  gameOver,
-}: {
-  cell: Cell;
-  onLeftClick: () => void;
-  onRightClick: (e: React.MouseEvent | React.TouchEvent) => void;
-  gameOver: boolean;
-}) {
+  showRock,
+}: CellButtonProps) {
   const background = cell.revealed ? `url('/clean.png')` : `url('/dirty.png')`;
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const longPressed = useRef(false);
@@ -59,7 +61,7 @@ function CellButton({
           {cell.adjacentRocks}
         </span>
       )}
-      {cell.flagged && !gameOver && !cell.revealed && (
+      {cell.flagged && !showRock && !cell.revealed && (
         <Image
           src="/flag.png"
           alt="Flag"
@@ -69,7 +71,7 @@ function CellButton({
           draggable={false}
         />
       )}
-      {gameOver && cell.hasRock && (
+      {showRock && cell.hasRock && (
         <Image
           src="/rock.png"
           alt="Rock"
