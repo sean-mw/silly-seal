@@ -50,7 +50,7 @@ export function useMiniGame<T extends GameState>(
   }, [generateInitialGameState, setGameState]);
 
   useEffect(() => {
-    if (gameState === undefined || !gameState.isGameOver) return;
+    if (gameState === undefined) return;
 
     const createdAt = gameState.createdAt ?? 0;
     const createdAtDate = new Date(createdAt);
