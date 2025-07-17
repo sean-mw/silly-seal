@@ -8,6 +8,7 @@ interface GameGridProps {
   isGameOver: boolean;
   animatingRow: number | undefined;
   revealIndex: number;
+  animateFinalRow: boolean;
 }
 
 function GameGrid({
@@ -16,6 +17,7 @@ function GameGrid({
   isGameOver,
   animatingRow,
   revealIndex,
+  animateFinalRow,
 }: GameGridProps) {
   return (
     <div className="flex flex-col gap-1">
@@ -23,9 +25,15 @@ function GameGrid({
         const isCurrent = rowIdx === guesses.length && !isGameOver;
         const guessRow = guesses[rowIdx]?.guess ?? [];
         const feedbackRow = guesses[rowIdx]?.feedback ?? [];
+        const isFinalRow = rowIdx == guesses.length - 1;
 
         return (
-          <div key={rowIdx} className="flex gap-1">
+          <div
+            key={rowIdx}
+            className={`flex gap-1 ${
+              isFinalRow && animateFinalRow && "animate-bounce"
+            }`}
+          >
             {Array.from({ length: GAME_CONFIG.SEQUENCE_LENGTH }).map(
               (_, colIdx) => {
                 const fish = isCurrent

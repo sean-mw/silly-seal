@@ -25,6 +25,7 @@ function FeedGame() {
     useMiniGame<FeedGameState>("feed", generateInitialGameState);
   const [animatingRow, setAnimatingRow] = useState<number | undefined>();
   const [revealIndex, setRevealIndex] = useState(0);
+  const [animateFinalRow, setAnimateFinalRow] = useState(false);
 
   useEffect(() => {
     if (
@@ -33,27 +34,49 @@ function FeedGame() {
     ) {
       return;
     }
-    const timeout = setTimeout(() => {
+    setTimeout(() => {
       setRevealIndex((i) => i + 1);
     }, 500);
-    return () => clearTimeout(timeout);
   }, [animatingRow, revealIndex]);
 
   useEffect(() => {
     if (
       gameState === undefined ||
+      gameState.guesses.length === 0 ||
       animatingRow === undefined ||
-      revealIndex !== GAME_CONFIG.SEQUENCE_LENGTH
+      revealIndex < GAME_CONFIG.SEQUENCE_LENGTH
     ) {
       return;
     }
+
     setGameState((prev) => ({
       ...prev!,
       keyboardColors: FeedGameEngine.computeKeyboardColors(gameState.guesses),
     }));
     setAnimatingRow(undefined);
     setRevealIndex(0);
-  }, [animatingRow, gameState, revealIndex, setGameState]);
+
+    const feedback = gameState.guesses.at(-1)!.feedback;
+    const isGameWon = FeedGameEngine.isGameWon(feedback);
+    const isGameOver = FeedGameEngine.isGameOver(gameState.guesses, isGameWon);
+
+    if (!isGameOver) return;
+    if (isGameWon) {
+      setTimeout(() => {
+        setAnimateFinalRow(true);
+        setTimeout(() => setAnimateFinalRow(false), 500);
+      }, 300);
+    }
+
+    setTimeout(
+      () =>
+        endGame({
+          stat: "hunger",
+          value: GAME_CONFIG.STAT_REWARD,
+        }),
+      1000
+    );
+  }, [animatingRow, endGame, gameState, revealIndex, setGameState]);
 
   // TODO: better loading animation
   if (!gameState) return <>Loading...</>;
@@ -103,15 +126,6 @@ function FeedGame() {
 
     setAnimatingRow(updatedGuesses.length - 1);
     setRevealIndex(0);
-
-    const isGameWon = FeedGameEngine.isGameWon(feedback);
-    const isGameOver = FeedGameEngine.isGameOver(updatedGuesses, isGameWon);
-    if (isGameOver) {
-      endGame({
-        stat: "hunger",
-        value: GAME_CONFIG.STAT_REWARD,
-      });
-    }
   };
 
   return (
@@ -130,6 +144,7 @@ function FeedGame() {
         isGameOver={gameState.isGameOver}
         animatingRow={animatingRow}
         revealIndex={revealIndex}
+        animateFinalRow={animateFinalRow}
       />
       <GameControls
         onAddFish={handleAddFish}
