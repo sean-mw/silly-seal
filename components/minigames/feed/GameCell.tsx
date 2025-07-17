@@ -6,12 +6,14 @@ interface GameCellProps {
   fish?: string;
   feedback?: FeedbackType;
   size?: string;
+  animate: boolean;
 }
 
 function GameCell({
   fish,
   feedback,
   size = GAME_CONFIG.CELL_SIZE,
+  animate,
 }: GameCellProps) {
   const colorClass = feedback
     ? FEEDBACK_COLORS[feedback]
@@ -19,7 +21,12 @@ function GameCell({
 
   return (
     <div
-      className={`${size} ${GAME_CONFIG.BUTTON_STYLE} ${colorClass}`}
+      className={`
+        ${size} 
+        ${GAME_CONFIG.BUTTON_STYLE}
+        ${colorClass}
+        ${animate ? "animate-bounce" : ""}
+      `}
       style={{ imageRendering: "pixelated" }}
     >
       {fish && (

@@ -7,6 +7,7 @@ import { FeedGameEngine } from "@/lib/minigames/feed/engine";
 import { GAME_CONFIG } from "@/lib/minigames/feed/config";
 import GameGrid from "@/components/minigames/feed/GameGrid";
 import GameControls from "@/components/minigames/feed/GameControls";
+import { useEffect, useState } from "react";
 
 const generateInitialGameState = async (): Promise<FeedGameState> => {
   return {
@@ -22,6 +23,37 @@ const generateInitialGameState = async (): Promise<FeedGameState> => {
 function FeedGame() {
   const { gameState, setGameState, endGame, resetGame } =
     useMiniGame<FeedGameState>("feed", generateInitialGameState);
+  const [animatingRow, setAnimatingRow] = useState<number | undefined>();
+  const [revealIndex, setRevealIndex] = useState(0);
+
+  useEffect(() => {
+    if (
+      animatingRow == undefined ||
+      revealIndex >= GAME_CONFIG.SEQUENCE_LENGTH
+    ) {
+      return;
+    }
+    const timeout = setTimeout(() => {
+      setRevealIndex((i) => i + 1);
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [animatingRow, revealIndex]);
+
+  useEffect(() => {
+    if (
+      gameState === undefined ||
+      animatingRow === undefined ||
+      revealIndex !== GAME_CONFIG.SEQUENCE_LENGTH
+    ) {
+      return;
+    }
+    setGameState((prev) => ({
+      ...prev!,
+      keyboardColors: FeedGameEngine.computeKeyboardColors(gameState.guesses),
+    }));
+    setAnimatingRow(undefined);
+    setRevealIndex(0);
+  }, [animatingRow, gameState, revealIndex, setGameState]);
 
   // TODO: better loading animation
   if (!gameState) return <>Loading...</>;
@@ -67,8 +99,10 @@ function FeedGame() {
       ...prev!,
       guesses: updatedGuesses,
       currentGuess: [],
-      keyboardColors: FeedGameEngine.computeKeyboardColors(updatedGuesses),
     }));
+
+    setAnimatingRow(updatedGuesses.length - 1);
+    setRevealIndex(0);
 
     const isGameWon = FeedGameEngine.isGameWon(feedback);
     const isGameOver = FeedGameEngine.isGameOver(updatedGuesses, isGameWon);
@@ -94,6 +128,8 @@ function FeedGame() {
         guesses={gameState.guesses}
         currentGuess={gameState.currentGuess}
         isGameOver={gameState.isGameOver}
+        animatingRow={animatingRow}
+        revealIndex={revealIndex}
       />
       <GameControls
         onAddFish={handleAddFish}

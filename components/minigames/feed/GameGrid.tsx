@@ -1,4 +1,4 @@
-import { GuessWithFeedback } from "@/types/minigames/feed";
+import { FeedbackType, GuessWithFeedback } from "@/types/minigames/feed";
 import GameCell from "./GameCell";
 import { GAME_CONFIG } from "@/lib/minigames/feed/config";
 
@@ -6,9 +6,17 @@ interface GameGridProps {
   guesses: GuessWithFeedback[];
   currentGuess: string[];
   isGameOver: boolean;
+  animatingRow: number | undefined;
+  revealIndex: number;
 }
 
-function GameGrid({ guesses, currentGuess, isGameOver }: GameGridProps) {
+function GameGrid({
+  guesses,
+  currentGuess,
+  isGameOver,
+  animatingRow,
+  revealIndex,
+}: GameGridProps) {
   return (
     <div className="flex flex-col gap-1">
       {Array.from({ length: GAME_CONFIG.MAX_ATTEMPTS }).map((_, rowIdx) => {
@@ -23,10 +31,23 @@ function GameGrid({ guesses, currentGuess, isGameOver }: GameGridProps) {
                 const fish = isCurrent
                   ? currentGuess[colIdx]
                   : guessRow[colIdx];
-                const feedback = isCurrent ? undefined : feedbackRow[colIdx];
+                let feedback: FeedbackType | undefined;
+                if (!isCurrent) {
+                  if (animatingRow === rowIdx) {
+                    feedback =
+                      colIdx <= revealIndex ? feedbackRow[colIdx] : undefined;
+                  } else {
+                    feedback = feedbackRow[colIdx];
+                  }
+                }
 
                 return (
-                  <GameCell key={colIdx} fish={fish} feedback={feedback} />
+                  <GameCell
+                    key={colIdx}
+                    fish={fish}
+                    feedback={feedback}
+                    animate={animatingRow === rowIdx && colIdx === revealIndex}
+                  />
                 );
               }
             )}
