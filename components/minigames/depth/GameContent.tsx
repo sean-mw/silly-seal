@@ -1,7 +1,7 @@
 import React from "react";
 import SpeciesCard from "./SpeciesCard";
 import { DepthGameState } from "@/types/minigames/depth";
-import GuessFeedback from "./GuessFeedback";
+import GuessFeedback from "../../ResultFeedback";
 
 interface GameContentProps {
   gameState: DepthGameState;
