@@ -1,45 +1,38 @@
 "use client";
 
-import { MiniGame } from "@/components/minigames/MiniGame";
-import { useMiniGame } from "@/hooks/useMiniGame";
-import { DepthGameState } from "@/types/minigames/depth";
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import {
+  makeGuess,
+  resetGame,
+  reinitializeWithSpeciesList,
+  markRewardApplied,
+} from "@/store/depthGameSlice";
 import { DepthGameEngine } from "@/lib/minigames/depth/engine";
-import { GAME_CONFIG } from "@/lib/minigames/depth/config";
 import GameContent from "@/components/minigames/depth/GameContent";
-import { GameReward } from "@/types/minigames/common";
-import { useState } from "react";
-
-const generateInitialGameState = async (): Promise<DepthGameState> => {
-  const speciesList = await DepthGameEngine.loadSpecies();
-  const currentIdx = DepthGameEngine.getRandomIndex(speciesList.length);
-  const nextIdx = DepthGameEngine.getRandomIndex(
-    speciesList.length,
-    currentIdx
-  );
-  return {
-    isGameOver: false,
-    createdAt: Date.now(),
-    score: 0,
-    speciesList,
-    currentIdx,
-    nextIdx,
-  };
-};
+import { GAME_CONFIG } from "@/lib/minigames/depth/config";
+import MiniGame from "@/components/minigames/MiniGame";
 
 function DepthGame() {
-  const { gameState, setGameState, endGame, resetGame } =
-    useMiniGame<DepthGameState>("depth", generateInitialGameState);
+  const dispatch = useAppDispatch();
+  const gameState = useAppSelector((state) => state.depthGame);
   const [guessResult, setGuessResult] = useState<
     "correct" | "incorrect" | undefined
   >();
 
-  // TODO: better loading animation
-  if (!gameState) return <>Loading...</>;
+  useEffect(() => {
+    if (gameState.isGameOver || gameState.speciesList !== undefined) return;
+    (async () => {
+      const speciesList = await DepthGameEngine.loadSpecies();
+      dispatch(reinitializeWithSpeciesList(speciesList));
+    })();
+  }, [dispatch, gameState.isGameOver, gameState.speciesList]);
 
   const handleGuess = (guess: "higher" | "lower") => {
     if (
       gameState.currentIdx === undefined ||
       gameState.nextIdx === undefined ||
+      gameState.speciesList === undefined ||
       gameState.isGameOver ||
       guessResult !== undefined
     ) {
@@ -59,31 +52,8 @@ function DepthGame() {
     setGuessResult(isCorrect ? "correct" : "incorrect");
 
     setTimeout(() => {
-      let reward: GameReward | undefined;
-      setGameState((prev) => {
-        if (!prev) return prev;
-
-        if (isCorrect) {
-          const newNextIdx = DepthGameEngine.getRandomIndex(
-            prev.speciesList.length,
-            prev.nextIdx
-          );
-          return {
-            ...prev,
-            score: prev.score + 1,
-            currentIdx: prev.nextIdx,
-            nextIdx: newNextIdx,
-          };
-        } else {
-          reward = {
-            stat: "happiness",
-            value: GAME_CONFIG.SCORE_MULTIPLIER * prev.score,
-          };
-          return { ...prev, isGameOver: true };
-        }
-      });
+      dispatch(makeGuess(guess));
       setGuessResult(undefined);
-      if (reward) endGame(reward);
     }, GAME_CONFIG.REVEAL_DELAY);
   };
 
@@ -94,9 +64,11 @@ function DepthGame() {
         description:
           "Guess whether the next species lives at a shallower or deeper depth!",
         allowRestart: true,
+        stat: "happiness",
       }}
       gameState={gameState}
-      onRestart={resetGame}
+      onRestart={() => dispatch(resetGame())}
+      onReward={() => dispatch(markRewardApplied())}
     >
       <GameContent
         gameState={gameState}

@@ -1,10 +1,10 @@
-import { GameReward } from "@/types/minigames/common";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+export type SealStat = "hunger" | "happiness" | "cleanliness";
+
 export type SealState = {
-  hunger: number;
-  happiness: number;
-  cleanliness: number;
+  [key in SealStat]: number;
+} & {
   lastUpdate: number;
 };
 
@@ -12,16 +12,21 @@ export const MAX_STAT_VALUE = 100;
 const INITIAL_STAT_VALUE = MAX_STAT_VALUE / 2;
 const DAILY_DECAY = MAX_STAT_VALUE / 3;
 
+const initialState: SealState = {
+  hunger: INITIAL_STAT_VALUE,
+  happiness: INITIAL_STAT_VALUE,
+  cleanliness: INITIAL_STAT_VALUE,
+  lastUpdate: Date.now(),
+};
+
 const sealSlice = createSlice({
   name: "seal",
-  initialState: {
-    hunger: INITIAL_STAT_VALUE,
-    happiness: INITIAL_STAT_VALUE,
-    cleanliness: INITIAL_STAT_VALUE,
-    lastUpdate: Date.now(),
-  },
+  initialState,
   reducers: {
-    applyReward: (state, action: PayloadAction<GameReward>) => {
+    applyReward: (
+      state,
+      action: PayloadAction<{ stat: SealStat; value: number }>
+    ) => {
       const { stat, value } = action.payload;
       state[stat] = Math.min(MAX_STAT_VALUE, state[stat] + value);
     },

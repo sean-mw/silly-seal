@@ -1,66 +1,47 @@
-import { GAME_CONFIG } from "@/lib/minigames/clean/config";
-import { CleanGameEngine } from "@/lib/minigames/clean/engine";
-import CellButton from "./CellButton";
-import { Cell, CleanGameState } from "@/types/minigames/clean";
-import { GameReward } from "@/types/minigames/common";
-import { useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
+import { useAppDispatch } from "@/lib/hooks";
+import { revealCell, flagCell } from "@/store/cleanGameSlice";
 import GuessFeedback from "../../ResultFeedback";
+import CellButton from "./CellButton";
+import { GAME_CONFIG } from "@/lib/minigames/clean/config";
+import { CleanGameState } from "@/types/minigames/clean";
 
 interface CellGridProps {
   gameState: CleanGameState;
-  updateGameState: (
-    update: (prev: CleanGameState | undefined) => CleanGameState | undefined
-  ) => void;
-  endGame: (reward: GameReward) => void;
 }
 
-function CellGrid({ gameState, updateGameState, endGame }: CellGridProps) {
+function CellGrid({ gameState }: CellGridProps) {
+  const dispatch = useAppDispatch();
   const [showRocks, setShowRocks] = useState(false);
   const [gameResult, setGameResult] = useState<
     "correct" | "incorrect" | undefined
   >(undefined);
   const [shakeAnimation, setShakeAnimation] = useState(false);
 
-  const checkVictory = (grid: Cell[][]) => {
-    if (!CleanGameEngine.isCleared(grid)) return;
-    setShowRocks(true);
-    setGameResult("correct");
-    setTimeout(() => {
-      endGame({
-        stat: "cleanliness",
-        value: GAME_CONFIG.STAT_REWARD,
-      });
-      setShowRocks(false);
-      setGameResult(undefined);
-    }, 1500);
-  };
+  useEffect(() => {
+    if (gameState.isGameOver) {
+      if (gameState.reward > 0) {
+        setGameResult("correct");
+      } else {
+        setGameResult("incorrect");
+        setShakeAnimation(true);
+        setShowRocks(true);
+      }
 
-  const handleLeftClick = (x: number, y: number) => {
-    if (gameState.isGameOver || gameResult) return;
-    const newGrid = gameState.grid.map((row) =>
-      row.map((cell) => ({ ...cell }))
-    );
-    const cell = newGrid[y][x];
-    if (cell.revealed || cell.flagged) return;
-    if (cell.hasRock) {
-      setShowRocks(true);
-      setGameResult("incorrect");
-      setShakeAnimation(true);
-      setTimeout(() => {
-        endGame({
-          stat: "cleanliness",
-          value: 0,
-        });
-        setShowRocks(false);
+      const timeout = setTimeout(() => {
         setGameResult(undefined);
         setShakeAnimation(false);
+        setShowRocks(false);
       }, 1500);
-    } else {
-      CleanGameEngine.revealEmptyCells(newGrid, x, y);
-    }
 
-    updateGameState((prev) => ({ ...prev!, grid: newGrid }));
-    checkVictory(newGrid);
+      return () => clearTimeout(timeout);
+    }
+  }, [gameState.isGameOver, gameState.reward]);
+
+  const handleLeftClick = (x: number, y: number) => {
+    dispatch(revealCell({ x, y }));
   };
 
   const handleRightClick = (
@@ -69,14 +50,7 @@ function CellGrid({ gameState, updateGameState, endGame }: CellGridProps) {
     y: number
   ) => {
     e.preventDefault();
-    if (gameState.isGameOver) return;
-    const newGrid = gameState.grid.map((row) =>
-      row.map((cell) => ({ ...cell }))
-    );
-    const cell = newGrid[y][x];
-    if (cell.revealed) return;
-    cell.flagged = !cell.flagged;
-    updateGameState((prev) => ({ ...prev!, grid: newGrid }));
+    dispatch(flagCell({ x, y }));
   };
 
   return (

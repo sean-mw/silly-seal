@@ -8,6 +8,5 @@ export type Cell = {
 };
 
 export interface CleanGameState extends GameState {
-  isGameOver: boolean;
   grid: Cell[][];
 }

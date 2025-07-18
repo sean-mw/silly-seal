@@ -1,14 +1,17 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useRef } from "react";
 import Button from "@/components/Button";
 import StatusBar from "@/components/StatusBar";
 import { GameState, MiniGameConfig } from "@/types/minigames/common";
 import { useCountdownToMidnight } from "@/hooks/useMidnightCountdown";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { applyReward } from "@/store/sealSlice";
 
 interface MiniGameProps {
   config: MiniGameConfig;
   gameState: GameState;
+  onReward: () => void;
   onRestart: () => void;
   children: ReactNode;
 }
@@ -21,16 +24,32 @@ function formatCountdown(ms: number) {
   return `${hours}h ${minutes}m ${seconds}s`;
 }
 
-export function MiniGame({
+function MiniGame({
   config,
   gameState,
+  onReward,
   onRestart,
   children,
 }: MiniGameProps) {
   const countdown = useCountdownToMidnight();
+  const sealState = useAppSelector((state) => state.seal);
+  const dispatch = useAppDispatch();
+  const prevStatValueRef = useRef<number | null>(null);
 
-  const prevValue = gameState.reward?.prevValue ?? 0;
-  const newValue = prevValue + (gameState.reward?.value ?? 0);
+  useEffect(() => {
+    if (!gameState.isGameOver || gameState.rewardApplied) return;
+    prevStatValueRef.current = sealState[config.stat];
+    dispatch(applyReward({ stat: config.stat, value: gameState.reward }));
+    onReward();
+  }, [
+    config.stat,
+    dispatch,
+    gameState.isGameOver,
+    gameState.reward,
+    gameState.rewardApplied,
+    onReward,
+    sealState,
+  ]);
 
   return (
     <div className="flex flex-col w-full h-full items-center justify-center gap-4">
@@ -38,18 +57,19 @@ export function MiniGame({
       {gameState.isGameOver && countdown && (
         <div className="flex flex-col gap-4 text-center items-center w-full max-w-md">
           <div className="text-lg font-semibold">Game Over!</div>
-          {gameState.isGameOver &&
-            gameState.reward &&
-            typeof gameState.reward.prevValue === "number" && (
-              <div className="w-full">
-                <StatusBar
-                  title={`+${gameState.reward.value} ${gameState.reward.stat}`}
-                  percent={Math.min(newValue / 100, 1)}
-                  onClick={() => {}}
-                  prevPercent={prevValue / 100}
-                />
-              </div>
-            )}
+          {gameState.isGameOver && (
+            <div className="w-full">
+              <StatusBar
+                title={`+${gameState.reward} ${config.stat}`}
+                percent={Math.min(sealState[config.stat] / 100, 1)}
+                prevPercent={
+                  prevStatValueRef.current !== null
+                    ? prevStatValueRef.current / 100
+                    : undefined
+                }
+              />
+            </div>
+          )}
           <div className="text-sm">You can play again in:</div>
           <div className="text-xl font-mono">{formatCountdown(countdown)}</div>
           {config.allowRestart !== false && (
@@ -60,3 +80,5 @@ export function MiniGame({
     </div>
   );
 }
+
+export default MiniGame;

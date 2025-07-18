@@ -16,7 +16,7 @@ export default function GameContent({
 }: GameContentProps) {
   if (
     !gameState ||
-    !gameState.speciesList.length ||
+    !gameState.speciesList ||
     gameState.currentIdx == undefined ||
     gameState.nextIdx == undefined
   ) {

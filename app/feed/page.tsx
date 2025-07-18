@@ -1,35 +1,32 @@
 "use client";
 
-import { MiniGame } from "@/components/minigames/MiniGame";
-import { useMiniGame } from "@/hooks/useMiniGame";
-import { GuessWithFeedback, FeedGameState } from "@/types/minigames/feed";
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import {
+  addFish,
+  removeFish,
+  submitGuess,
+  updateKeyboardColors,
+  endGame,
+  resetGame,
+  markRewardApplied,
+} from "@/store/feedGameSlice";
 import { FeedGameEngine } from "@/lib/minigames/feed/engine";
-import { GAME_CONFIG } from "@/lib/minigames/feed/config";
+import MiniGame from "@/components/minigames/MiniGame";
 import GameGrid from "@/components/minigames/feed/GameGrid";
 import GameControls from "@/components/minigames/feed/GameControls";
-import { useEffect, useState } from "react";
-
-const generateInitialGameState = async (): Promise<FeedGameState> => {
-  return {
-    isGameOver: false,
-    createdAt: Date.now(),
-    secret: FeedGameEngine.generateRandomSequence(),
-    currentGuess: [],
-    guesses: [],
-    keyboardColors: {},
-  };
-};
+import { GAME_CONFIG } from "@/lib/minigames/feed/config";
 
 function FeedGame() {
-  const { gameState, setGameState, endGame, resetGame } =
-    useMiniGame<FeedGameState>("feed", generateInitialGameState);
+  const dispatch = useAppDispatch();
+  const gameState = useAppSelector((state) => state.feedGame);
   const [animatingRow, setAnimatingRow] = useState<number | undefined>();
   const [revealIndex, setRevealIndex] = useState(0);
   const [animateFinalRow, setAnimateFinalRow] = useState(false);
 
   useEffect(() => {
     if (
-      animatingRow == undefined ||
+      animatingRow === undefined ||
       revealIndex >= GAME_CONFIG.SEQUENCE_LENGTH
     ) {
       return;
@@ -41,18 +38,13 @@ function FeedGame() {
 
   useEffect(() => {
     if (
-      gameState === undefined ||
-      gameState.guesses.length === 0 ||
+      !gameState.guesses.length ||
       animatingRow === undefined ||
       revealIndex < GAME_CONFIG.SEQUENCE_LENGTH
     ) {
       return;
     }
-
-    setGameState((prev) => ({
-      ...prev!,
-      keyboardColors: FeedGameEngine.computeKeyboardColors(gameState.guesses),
-    }));
+    dispatch(updateKeyboardColors());
     setAnimatingRow(undefined);
     setRevealIndex(0);
 
@@ -67,64 +59,22 @@ function FeedGame() {
         setTimeout(() => setAnimateFinalRow(false), 500);
       }, 300);
     }
+    setTimeout(() => dispatch(endGame()), 1000);
+  }, [animatingRow, dispatch, gameState.guesses, revealIndex]);
 
-    setTimeout(
-      () =>
-        endGame({
-          stat: "hunger",
-          value: GAME_CONFIG.STAT_REWARD,
-        }),
-      1000
-    );
-  }, [animatingRow, endGame, gameState, revealIndex, setGameState]);
-
-  // TODO: better loading animation
   if (!gameState) return <>Loading...</>;
 
   const handleAddFish = (fish: string) => {
-    if (
-      !gameState.isGameOver &&
-      gameState.currentGuess.length < GAME_CONFIG.SEQUENCE_LENGTH
-    ) {
-      setGameState((prev) => ({
-        ...prev!,
-        currentGuess: [...prev!.currentGuess, fish],
-      }));
-    }
+    dispatch(addFish(fish));
   };
 
-  const handleRemoveLastFish = () => {
-    setGameState((prev) => ({
-      ...prev!,
-      currentGuess: prev!.currentGuess.slice(0, -1),
-    }));
+  const handleRemoveFish = () => {
+    dispatch(removeFish());
   };
 
   const handleSubmitGuess = () => {
-    if (
-      gameState.currentGuess.length !== GAME_CONFIG.SEQUENCE_LENGTH ||
-      gameState.isGameOver
-    ) {
-      return;
-    }
-
-    const feedback = FeedGameEngine.calculateFeedback(
-      gameState.secret,
-      gameState.currentGuess
-    );
-    const newGuess: GuessWithFeedback = {
-      guess: gameState.currentGuess,
-      feedback,
-    };
-    const updatedGuesses = [...gameState.guesses, newGuess];
-
-    setGameState((prev) => ({
-      ...prev!,
-      guesses: updatedGuesses,
-      currentGuess: [],
-    }));
-
-    setAnimatingRow(updatedGuesses.length - 1);
+    dispatch(submitGuess());
+    setAnimatingRow(gameState.guesses.length);
     setRevealIndex(0);
   };
 
@@ -134,9 +84,11 @@ function FeedGame() {
         name: "Feed Mini-Game",
         description: "Feed the seal by guessing the correct sequence of fish!",
         allowRestart: true,
+        stat: "hunger",
       }}
       gameState={gameState}
-      onRestart={resetGame}
+      onRestart={() => dispatch(resetGame())}
+      onReward={() => dispatch(markRewardApplied())}
     >
       <GameGrid
         guesses={gameState.guesses}
@@ -149,7 +101,7 @@ function FeedGame() {
       <GameControls
         onAddFish={handleAddFish}
         onSubmitGuess={handleSubmitGuess}
-        onRemoveLastFish={handleRemoveLastFish}
+        onRemoveFish={handleRemoveFish}
         isGameOver={gameState.isGameOver}
         currentGuessLength={gameState.currentGuess.length}
         keyboardColors={gameState.keyboardColors}

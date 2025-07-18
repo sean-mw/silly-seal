@@ -1,6 +1,9 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import sealReducer from "./sealSlice";
+import cleanGameReducer from "./cleanGameSlice";
+import depthGameReducer from "./depthGameSlice";
+import feedGameReducer from "./feedGameSlice";
 import storage from "./storage";
 
 const persistConfig = {
@@ -10,6 +13,9 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   seal: sealReducer,
+  cleanGame: cleanGameReducer,
+  depthGame: depthGameReducer,
+  feedGame: feedGameReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

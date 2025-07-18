@@ -11,7 +11,7 @@ type StatusBarProps = {
   percent: number;
   prevPercent?: number;
   buttonLabel?: string;
-  onClick: () => void;
+  onClick?: () => void;
   className?: string;
 };
 
