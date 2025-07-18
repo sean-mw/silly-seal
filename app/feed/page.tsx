@@ -87,7 +87,7 @@ function FeedGame() {
         stat: "hunger",
       }}
       gameState={gameState}
-      onRestart={() => dispatch(resetGame())}
+      onReset={() => dispatch(resetGame())}
       onReward={() => dispatch(markRewardApplied())}
     >
       <GameGrid

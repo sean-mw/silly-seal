@@ -18,7 +18,7 @@ function CleanGame() {
         allowRestart: true,
       }}
       gameState={gameState}
-      onRestart={() => dispatch(resetGame())}
+      onReset={() => dispatch(resetGame())}
       onReward={() => dispatch(markRewardApplied())}
     >
       <div className="flex flex-col h-full items-center justify-center gap-4">

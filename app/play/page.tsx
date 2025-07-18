@@ -67,7 +67,7 @@ function DepthGame() {
         stat: "happiness",
       }}
       gameState={gameState}
-      onRestart={() => dispatch(resetGame())}
+      onReset={() => dispatch(resetGame())}
       onReward={() => dispatch(markRewardApplied())}
     >
       <GameContent

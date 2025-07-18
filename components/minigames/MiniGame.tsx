@@ -7,12 +7,13 @@ import { GameState, MiniGameConfig } from "@/types/minigames/common";
 import { useCountdownToMidnight } from "@/hooks/useMidnightCountdown";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { applyReward } from "@/store/sealSlice";
+import { useDailyReset } from "@/hooks/useDailyReset";
 
 interface MiniGameProps {
   config: MiniGameConfig;
   gameState: GameState;
   onReward: () => void;
-  onRestart: () => void;
+  onReset: () => void;
   children: ReactNode;
 }
 
@@ -28,10 +29,11 @@ function MiniGame({
   config,
   gameState,
   onReward,
-  onRestart,
+  onReset: onRestart,
   children,
 }: MiniGameProps) {
   const countdown = useCountdownToMidnight();
+  useDailyReset(gameState.createdAt, onRestart);
   const sealState = useAppSelector((state) => state.seal);
   const dispatch = useAppDispatch();
   const prevStatValueRef = useRef<number | null>(null);
