@@ -1,4 +1,4 @@
-import { SealState } from "@/hooks/useSeal";
+import { SealState } from "@/store/sealSlice";
 
 export interface GameState {
   isGameOver: boolean;
