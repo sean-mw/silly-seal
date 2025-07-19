@@ -23,7 +23,7 @@ function CellButton({ cell, onLeftClick, onRightClick }: CellButtonProps) {
     longPressTimer.current = setTimeout(() => {
       longPressed.current = true;
       onRightClick(e);
-    }, 500);
+    }, 300);
   };
 
   const handleTouchEnd = () => {
