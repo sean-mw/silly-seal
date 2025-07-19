@@ -1,19 +1,17 @@
-import { SealState } from "@/hooks/useSeal";
+import { SealStat } from "@/store/sealSlice";
 
 export interface GameState {
   isGameOver: boolean;
-  reward?: GameReward;
   createdAt: number;
-}
-
-export interface GameReward {
-  stat: keyof SealState;
-  value: number;
-  prevValue?: number;
+  reward: number;
+  rewardApplied: boolean;
 }
 
 export interface MiniGameConfig {
   name: string;
+  stat: SealStat;
   description: string;
   allowRestart: boolean;
 }
+
+export type GameFeedback = "correct" | "incorrect" | "pending";

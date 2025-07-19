@@ -2,10 +2,11 @@ import React from "react";
 import SpeciesCard from "./SpeciesCard";
 import { DepthGameState } from "@/types/minigames/depth";
 import GuessFeedback from "../../ResultFeedback";
+import { GameFeedback } from "@/types/minigames/common";
 
 interface GameContentProps {
   gameState: DepthGameState;
-  guessResult: "correct" | "incorrect" | undefined;
+  guessResult: GameFeedback;
   onGuess: (guess: "higher" | "lower") => void;
 }
 
@@ -16,7 +17,7 @@ export default function GameContent({
 }: GameContentProps) {
   if (
     !gameState ||
-    !gameState.speciesList.length ||
+    !gameState.speciesList ||
     gameState.currentIdx == undefined ||
     gameState.nextIdx == undefined
   ) {
@@ -26,7 +27,7 @@ export default function GameContent({
 
   const currentSpecies = gameState.speciesList[gameState.currentIdx];
   const nextSpecies = gameState.speciesList[gameState.nextIdx];
-  const showNextDepth = guessResult !== undefined;
+  const showNextDepth = guessResult !== "pending";
 
   return (
     <div className="flex flex-col w-full h-full gap-2 text-center items-center justify-center">

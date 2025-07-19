@@ -1,3 +1,5 @@
+"use client";
+
 import { GAME_CONFIG } from "@/lib/minigames/clean/config";
 import { Cell } from "@/types/minigames/clean";
 import Image from "next/image";

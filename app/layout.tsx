@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-import { SealProvider } from "@/hooks/useSeal";
+import StoreProvider from "@/store/StoreProvider";
+import { SealDecayEffect } from "@/components/SealDecayEffect";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,14 +30,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-svh p-4 flex flex-col`}
       >
-        <div className="flex flex-shrink-0">
-          <Navbar />
-        </div>
-        <div className="flex justify-center items-center w-full h-full">
-          <SealProvider>
+        <StoreProvider>
+          <SealDecayEffect />
+          <div className="flex flex-shrink-0">
+            <Navbar />
+          </div>
+          <div className="flex justify-center items-center w-full h-full">
             <div className="max-w-lg h-full w-full">{children}</div>
-          </SealProvider>
-        </div>
+          </div>
+        </StoreProvider>
       </body>
     </html>
   );

@@ -2,11 +2,12 @@ import { Species } from "@/types/minigames/depth";
 
 export class DepthGameEngine {
   static getRandomIndex(max: number, excludeIndex?: number): number {
-    let idx = Math.floor(Math.random() * max);
-    while (idx === excludeIndex) {
-      idx = Math.floor(Math.random() * max);
+    if (max <= 1) return 0;
+    if (excludeIndex === undefined) {
+      return Math.floor(Math.random() * max);
     }
-    return idx;
+    const idx = Math.floor(Math.random() * (max - 1));
+    return idx >= excludeIndex ? idx + 1 : idx;
   }
 
   static isGuessCorrect(

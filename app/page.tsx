@@ -1,8 +1,8 @@
 "use client";
 
-import Seal from "@/components/Seal";
+import Seal from "@/components/SealImage";
 import StatusBar from "@/components/StatusBar";
-import { useSeal } from "@/hooks/useSeal";
+import { useAppSelector } from "@/lib/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -10,7 +10,7 @@ export default function Home() {
   const router = useRouter();
   const statusContainerRef = useRef<HTMLDivElement>(null);
   const [sealSize, setSealSize] = useState(512);
-  const { sealState } = useSeal();
+  const sealState = useAppSelector((state) => state.seal);
 
   useEffect(() => {
     const updateSealSize = () => {

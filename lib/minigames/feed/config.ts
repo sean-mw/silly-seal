@@ -1,4 +1,4 @@
-import { MAX_STAT_VALUE } from "@/hooks/useSeal";
+import { MAX_STAT_VALUE } from "@/store/sealSlice";
 
 export const GAME_CONFIG = {
   FISH_TYPES: ["anchovy", "clownfish", "crab", "pufferfish", "surgeonfish"],

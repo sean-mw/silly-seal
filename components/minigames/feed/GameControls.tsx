@@ -6,7 +6,7 @@ import { Delete } from "lucide-react";
 interface GameControlsProps {
   onAddFish: (fish: string) => void;
   onSubmitGuess: () => void;
-  onRemoveLastFish: () => void;
+  onRemoveFish: () => void;
   isGameOver: boolean;
   currentGuessLength: number;
   keyboardColors: Record<string, string>;
@@ -15,7 +15,7 @@ interface GameControlsProps {
 function GameControls({
   onAddFish,
   onSubmitGuess,
-  onRemoveLastFish,
+  onRemoveFish,
   isGameOver,
   currentGuessLength,
   keyboardColors,
@@ -42,7 +42,7 @@ function GameControls({
         <ActionButton onClick={onSubmitGuess} disabled={!canSubmit}>
           <span className="font-bold text-sm">FEED</span>
         </ActionButton>
-        <ActionButton onClick={onRemoveLastFish} disabled={!canDelete}>
+        <ActionButton onClick={onRemoveFish} disabled={!canDelete}>
           <Delete className="w-3/4 h-3/4" />
         </ActionButton>
       </div>
