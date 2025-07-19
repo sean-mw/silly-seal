@@ -16,6 +16,7 @@ export const getInitialState = (speciesList?: Species[]): DepthGameState => {
     reward: 0,
     rewardApplied: false,
     score: 0,
+    lives: GAME_CONFIG.LIVES,
     currentIdx,
     nextIdx,
     speciesList,
@@ -49,17 +50,21 @@ const depthGameSlice = createSlice({
       );
 
       if (isCorrect) {
-        const newNextIdx = DepthGameEngine.getRandomIndex(
-          state.speciesList.length,
-          state.nextIdx
-        );
         state.score += 1;
-        state.currentIdx = state.nextIdx;
-        state.nextIdx = newNextIdx;
       } else {
-        state.isGameOver = true;
-        state.reward = state.score * GAME_CONFIG.SCORE_MULTIPLIER;
+        state.lives -= 1;
+        if (state.lives <= 0) {
+          state.isGameOver = true;
+          state.reward = state.score * GAME_CONFIG.SCORE_MULTIPLIER;
+        }
       }
+
+      const newNextIdx = DepthGameEngine.getRandomIndex(
+        state.speciesList.length,
+        state.nextIdx
+      );
+      state.currentIdx = state.nextIdx;
+      state.nextIdx = newNextIdx;
     },
     resetGame(state) {
       return getInitialState(state.speciesList);

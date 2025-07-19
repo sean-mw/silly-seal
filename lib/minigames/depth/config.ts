@@ -1,4 +1,5 @@
 export const GAME_CONFIG = {
   SCORE_MULTIPLIER: 5,
   REVEAL_DELAY: 1500,
+  LIVES: 3,
 };

@@ -4,7 +4,8 @@ import { useAppSelector } from "@/lib/hooks";
 import Button from "./Button";
 import { usePathname, useRouter } from "next/navigation";
 import Lives from "./Lives";
-import { GAME_CONFIG } from "@/lib/minigames/clean/config";
+import { GAME_CONFIG as CLEAN_GAME_CONFIG } from "@/lib/minigames/clean/config";
+import { GAME_CONFIG as DEPTH_GAME_CONFIG } from "@/lib/minigames/depth/config";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -12,9 +13,15 @@ export default function Navbar() {
   const { gameState, maxLives } = useAppSelector((state) => {
     switch (pathname) {
       case "/clean":
-        return { gameState: state["cleanGame"], maxLives: GAME_CONFIG.LIVES };
+        return {
+          gameState: state["cleanGame"],
+          maxLives: CLEAN_GAME_CONFIG.LIVES,
+        };
       case "/play":
-        return { gameState: state["depthGame"], maxLives: undefined };
+        return {
+          gameState: state["depthGame"],
+          maxLives: DEPTH_GAME_CONFIG.LIVES,
+        };
       case "/feed":
         return { gameState: state["feedGame"], maxLives: undefined };
       default:
