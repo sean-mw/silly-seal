@@ -13,11 +13,19 @@ import GameContent from "@/components/minigames/depth/GameContent";
 import { GAME_CONFIG } from "@/lib/minigames/depth/config";
 import MiniGame from "@/components/minigames/MiniGame";
 import { GameFeedback } from "@/types/minigames/common";
+import { usePreloadImages } from "@/hooks/usePreloadImages";
 
 function DepthGame() {
   const dispatch = useAppDispatch();
   const gameState = useAppSelector((state) => state.depthGame);
   const [guessResult, setGuessResult] = useState<GameFeedback>("pending");
+  const { prevIdx, curIdx, nextIdx, speciesList } = gameState;
+
+  usePreloadImages(
+    [prevIdx, curIdx, nextIdx]
+      .filter((i) => i !== undefined)
+      .map((i) => speciesList?.[i]?.image_urls[0])
+  );
 
   useEffect(() => {
     if (gameState.isGameOver || gameState.speciesList !== undefined) return;
@@ -29,8 +37,8 @@ function DepthGame() {
 
   const handleGuess = (guess: "higher" | "lower") => {
     if (
-      gameState.currentIdx === undefined ||
-      gameState.nextIdx === undefined ||
+      gameState.prevIdx === undefined ||
+      gameState.curIdx === undefined ||
       gameState.speciesList === undefined ||
       gameState.isGameOver ||
       guessResult !== "pending"
@@ -38,14 +46,13 @@ function DepthGame() {
       return;
     }
 
-    const currentDepth =
-      gameState.speciesList[gameState.currentIdx].average_depth;
-    const nextDepth = gameState.speciesList[gameState.nextIdx].average_depth;
+    const prevDepth = gameState.speciesList[gameState.prevIdx].average_depth;
+    const curDepth = gameState.speciesList[gameState.curIdx].average_depth;
 
     const isCorrect = DepthGameEngine.isGuessCorrect(
       guess,
-      currentDepth,
-      nextDepth
+      prevDepth,
+      curDepth
     );
 
     setGuessResult(isCorrect ? "correct" : "incorrect");

@@ -18,23 +18,23 @@ export default function GameContent({
   if (
     !gameState ||
     !gameState.speciesList ||
-    gameState.currentIdx == undefined ||
-    gameState.nextIdx == undefined
+    gameState.prevIdx == undefined ||
+    gameState.curIdx == undefined
   ) {
     // TODO: better loading animation
     return <div className="text-center pt-8">Loading game...</div>;
   }
 
-  const currentSpecies = gameState.speciesList[gameState.currentIdx];
-  const nextSpecies = gameState.speciesList[gameState.nextIdx];
+  const prevSpecies = gameState.speciesList[gameState.prevIdx];
+  const curSpecies = gameState.speciesList[gameState.curIdx];
   const showNextDepth = guessResult !== "pending";
 
   return (
     <div className="flex flex-col w-full h-full gap-2 text-center items-center justify-center">
       <GuessFeedback result={guessResult} />
-      <SpeciesCard species={currentSpecies} showDepth />
+      <SpeciesCard species={prevSpecies} showDepth />
       <SpeciesCard
-        species={nextSpecies}
+        species={curSpecies}
         showDepth={showNextDepth}
         onGuess={onGuess}
         disabled={showNextDepth || gameState.isGameOver}

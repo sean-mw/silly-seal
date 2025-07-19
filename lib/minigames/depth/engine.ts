@@ -12,12 +12,12 @@ export class DepthGameEngine {
 
   static isGuessCorrect(
     guess: "higher" | "lower",
-    currentDepth: number,
-    nextDepth: number
+    prevDepth: number,
+    curDepth: number
   ): boolean {
     return (
-      (guess === "higher" && nextDepth <= currentDepth) ||
-      (guess === "lower" && nextDepth >= currentDepth)
+      (guess === "higher" && curDepth <= prevDepth) ||
+      (guess === "lower" && curDepth >= prevDepth)
     );
   }
 

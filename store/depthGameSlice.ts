@@ -4,11 +4,13 @@ import { DepthGameEngine } from "@/lib/minigames/depth/engine";
 import { GAME_CONFIG } from "@/lib/minigames/depth/config";
 
 export const getInitialState = (speciesList?: Species[]): DepthGameState => {
-  let currentIdx: number | undefined;
+  let prevIdx: number | undefined;
+  let curIdx: number | undefined;
   let nextIdx: number | undefined;
   if (speciesList !== undefined) {
-    currentIdx = DepthGameEngine.getRandomIndex(speciesList.length);
-    nextIdx = DepthGameEngine.getRandomIndex(speciesList.length, currentIdx);
+    prevIdx = DepthGameEngine.getRandomIndex(speciesList.length);
+    curIdx = DepthGameEngine.getRandomIndex(speciesList.length, prevIdx);
+    nextIdx = DepthGameEngine.getRandomIndex(speciesList.length, curIdx);
   }
   return {
     isGameOver: false,
@@ -17,7 +19,8 @@ export const getInitialState = (speciesList?: Species[]): DepthGameState => {
     rewardApplied: false,
     score: 0,
     lives: GAME_CONFIG.LIVES,
-    currentIdx,
+    prevIdx,
+    curIdx,
     nextIdx,
     speciesList,
   };
@@ -32,7 +35,8 @@ const depthGameSlice = createSlice({
     },
     makeGuess(state, action: PayloadAction<"higher" | "lower">) {
       if (
-        state.currentIdx === undefined ||
+        state.prevIdx === undefined ||
+        state.curIdx === undefined ||
         state.nextIdx === undefined ||
         state.speciesList === undefined ||
         state.isGameOver
@@ -40,13 +44,13 @@ const depthGameSlice = createSlice({
         return;
       }
 
-      const currentDepth = state.speciesList[state.currentIdx].average_depth;
-      const nextDepth = state.speciesList[state.nextIdx].average_depth;
+      const prevDepth = state.speciesList[state.prevIdx].average_depth;
+      const curDepth = state.speciesList[state.curIdx].average_depth;
 
       const isCorrect = DepthGameEngine.isGuessCorrect(
         action.payload,
-        currentDepth,
-        nextDepth
+        prevDepth,
+        curDepth
       );
 
       if (isCorrect) {
@@ -59,12 +63,12 @@ const depthGameSlice = createSlice({
         }
       }
 
-      const newNextIdx = DepthGameEngine.getRandomIndex(
+      state.prevIdx = state.curIdx;
+      state.curIdx = state.nextIdx;
+      state.nextIdx = DepthGameEngine.getRandomIndex(
         state.speciesList.length,
         state.nextIdx
       );
-      state.currentIdx = state.nextIdx;
-      state.nextIdx = newNextIdx;
     },
     resetGame(state) {
       return getInitialState(state.speciesList);

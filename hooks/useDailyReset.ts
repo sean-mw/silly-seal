@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect } from "react";
 
 export function useDailyReset(createdAt: number, reset: () => void): void {
