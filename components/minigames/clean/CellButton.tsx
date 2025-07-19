@@ -9,15 +9,9 @@ interface CellButtonProps {
   cell: Cell;
   onLeftClick: () => void;
   onRightClick: (e: React.MouseEvent | React.TouchEvent) => void;
-  showRock: boolean;
 }
 
-function CellButton({
-  cell,
-  onLeftClick,
-  onRightClick,
-  showRock,
-}: CellButtonProps) {
+function CellButton({ cell, onLeftClick, onRightClick }: CellButtonProps) {
   const background = cell.revealed ? `url('/clean.png')` : `url('/dirty.png')`;
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const longPressed = useRef(false);
@@ -63,7 +57,7 @@ function CellButton({
           {cell.adjacentRocks}
         </span>
       )}
-      {cell.flagged && !showRock && !cell.revealed && (
+      {cell.flagged && !cell.revealed && (
         <Image
           src="/flag.png"
           alt="Flag"
@@ -73,7 +67,7 @@ function CellButton({
           draggable={false}
         />
       )}
-      {showRock && cell.hasRock && (
+      {cell.revealed && cell.hasRock && (
         <Image
           src="/rock.png"
           alt="Rock"

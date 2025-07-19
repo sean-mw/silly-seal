@@ -11,6 +11,8 @@ import {
   markRewardApplied,
   resetGame,
   revealCell,
+  hitRock,
+  revealAllCells,
 } from "@/store/cleanGameSlice";
 import { GameFeedback } from "@/types/minigames/common";
 import { useCallback, useEffect, useState } from "react";
@@ -19,20 +21,21 @@ function CleanGame() {
   const dispatch = useAppDispatch();
   const gameState = useAppSelector((state) => state.cleanGame);
   const [gameResult, setGameResult] = useState<GameFeedback>("pending");
-  const [showRocks, setShowRocks] = useState(false);
   const [showShakeAnimation, setShowShakeAnimation] = useState(false);
+
+  const triggerShake = useCallback(() => {
+    setShowShakeAnimation(true);
+    setTimeout(() => {
+      setShowShakeAnimation(false);
+    }, 500);
+  }, []);
 
   const triggerEndGame = useCallback(
     (result: GameFeedback) => {
       setGameResult(result);
-      if (result === "incorrect") {
-        setShowRocks(true);
-        setShowShakeAnimation(true);
-      }
+      dispatch(revealAllCells());
       setTimeout(() => {
         setGameResult("pending");
-        setShowRocks(false);
-        setShowShakeAnimation(false);
         dispatch(endGame(result));
       }, 1500);
     },
@@ -47,7 +50,11 @@ function CleanGame() {
   }, [gameResult, gameState.grid, gameState.isGameOver, triggerEndGame]);
 
   const handleLeftClick = (x: number, y: number) => {
-    if (gameState.grid[y][x].hasRock) {
+    const cell = gameState.grid[y][x];
+    if (cell.hasRock && !cell.flagged && !cell.revealed) {
+      triggerShake();
+      dispatch(hitRock({ x, y }));
+      if (gameState.lives > 1) return;
       triggerEndGame("incorrect");
     } else {
       dispatch(revealCell({ x, y }));
@@ -75,7 +82,6 @@ function CleanGame() {
         <CellGrid
           grid={gameState.grid}
           showShakeAnimation={showShakeAnimation}
-          showRocks={showRocks}
           handleLeftClick={handleLeftClick}
           handleRightClick={handleRightClick}
         />

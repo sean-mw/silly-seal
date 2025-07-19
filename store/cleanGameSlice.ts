@@ -11,6 +11,7 @@ const getInitialState = (): CleanGameState => {
     grid: CleanGameEngine.initializeGrid(),
     reward: 0,
     rewardApplied: false,
+    lives: GAME_CONFIG.LIVES,
   };
 };
 
@@ -39,9 +40,26 @@ const cleanGameSlice = createSlice({
       state.isGameOver = true;
       state.reward = action.payload === "correct" ? GAME_CONFIG.STAT_REWARD : 0;
     },
+    hitRock: (state, action: PayloadAction<{ x: number; y: number }>) => {
+      const { x, y } = action.payload;
+      state.grid[y][x].revealed = true;
+
+      if (state.lives === 0) return;
+      state.lives -= 1;
+    },
+    revealAllCells: (state) => {
+      CleanGameEngine.revealAllCells(state.grid);
+    },
   },
 });
 
-export const { resetGame, revealCell, flagCell, markRewardApplied, endGame } =
-  cleanGameSlice.actions;
+export const {
+  resetGame,
+  revealCell,
+  flagCell,
+  markRewardApplied,
+  endGame,
+  hitRock,
+  revealAllCells,
+} = cleanGameSlice.actions;
 export default cleanGameSlice.reducer;

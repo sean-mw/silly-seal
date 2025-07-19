@@ -88,10 +88,15 @@ export class CleanGameEngine {
 
   static isCleared(grid: Cell[][]): boolean {
     return grid.every((row) =>
-      row.every(
-        (cell) =>
-          (cell.hasRock && !cell.revealed) || (!cell.hasRock && cell.revealed)
-      )
+      row.every((cell) => cell.hasRock || cell.revealed)
     );
+  }
+
+  static revealAllCells(grid: Cell[][]): void {
+    for (let y = 0; y < GAME_CONFIG.GRID_SIZE; y++) {
+      for (let x = 0; x < GAME_CONFIG.GRID_SIZE; x++) {
+        grid[y][x].revealed = true;
+      }
+    }
   }
 }

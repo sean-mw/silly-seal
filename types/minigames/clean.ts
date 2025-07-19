@@ -9,4 +9,5 @@ export type Cell = {
 
 export interface CleanGameState extends GameState {
   grid: Cell[][];
+  lives: number;
 }

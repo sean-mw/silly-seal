@@ -5,7 +5,6 @@ import { Cell } from "@/types/minigames/clean";
 interface CellGridProps {
   grid: Cell[][];
   showShakeAnimation: boolean;
-  showRocks: boolean;
   handleLeftClick: (x: number, y: number) => void;
   handleRightClick: (x: number, y: number) => void;
 }
@@ -13,7 +12,6 @@ interface CellGridProps {
 function CellGrid({
   grid,
   showShakeAnimation,
-  showRocks,
   handleLeftClick,
   handleRightClick,
 }: CellGridProps) {
@@ -32,7 +30,6 @@ function CellGrid({
           <CellButton
             key={`${x}-${y}`}
             cell={cell}
-            showRock={showRocks}
             onLeftClick={() => handleLeftClick(x, y)}
             onRightClick={(e) => {
               e.preventDefault();
