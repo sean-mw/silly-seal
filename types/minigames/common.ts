@@ -13,3 +13,5 @@ export interface MiniGameConfig {
   description: string;
   allowRestart: boolean;
 }
+
+export type GameFeedback = "correct" | "incorrect" | "pending";

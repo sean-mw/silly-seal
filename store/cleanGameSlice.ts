@@ -1,6 +1,7 @@
 import { GAME_CONFIG } from "@/lib/minigames/clean/config";
 import { CleanGameEngine } from "@/lib/minigames/clean/engine";
 import { CleanGameState } from "@/types/minigames/clean";
+import { GameFeedback } from "@/types/minigames/common";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const getInitialState = (): CleanGameState => {
@@ -21,15 +22,7 @@ const cleanGameSlice = createSlice({
     revealCell: (state, action: PayloadAction<{ x: number; y: number }>) => {
       if (state.isGameOver) return;
       const { x, y } = action.payload;
-      if (state.grid[y][x].hasRock) {
-        state.isGameOver = true;
-        return;
-      }
       CleanGameEngine.revealEmptyCells(state.grid, x, y);
-      if (CleanGameEngine.isCleared(state.grid)) {
-        state.isGameOver = true;
-        state.reward = GAME_CONFIG.STAT_REWARD;
-      }
     },
     flagCell: (state, action: PayloadAction<{ x: number; y: number }>) => {
       if (state.isGameOver) return;
@@ -41,9 +34,14 @@ const cleanGameSlice = createSlice({
     markRewardApplied: (state) => {
       state.rewardApplied = true;
     },
+    endGame: (state, action: PayloadAction<GameFeedback>) => {
+      if (action.payload === "pending") return;
+      state.isGameOver = true;
+      state.reward = action.payload === "correct" ? GAME_CONFIG.STAT_REWARD : 0;
+    },
   },
 });
 
-export const { resetGame, revealCell, flagCell, markRewardApplied } =
+export const { resetGame, revealCell, flagCell, markRewardApplied, endGame } =
   cleanGameSlice.actions;
 export default cleanGameSlice.reducer;

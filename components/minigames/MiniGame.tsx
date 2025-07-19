@@ -29,11 +29,11 @@ function MiniGame({
   config,
   gameState,
   onReward,
-  onReset: onRestart,
+  onReset,
   children,
 }: MiniGameProps) {
   const countdown = useCountdownToMidnight();
-  useDailyReset(gameState.createdAt, onRestart);
+  useDailyReset(gameState.createdAt, onReset);
   const sealState = useAppSelector((state) => state.seal);
   const dispatch = useAppDispatch();
   const prevStatValueRef = useRef<number | null>(null);
@@ -75,7 +75,7 @@ function MiniGame({
           <div className="text-sm">You can play again in:</div>
           <div className="text-xl font-mono">{formatCountdown(countdown)}</div>
           {config.allowRestart !== false && (
-            <Button onClick={onRestart}>Restart</Button>
+            <Button onClick={onReset}>Restart</Button>
           )}
         </div>
       )}

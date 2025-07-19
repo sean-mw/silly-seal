@@ -12,13 +12,12 @@ import { DepthGameEngine } from "@/lib/minigames/depth/engine";
 import GameContent from "@/components/minigames/depth/GameContent";
 import { GAME_CONFIG } from "@/lib/minigames/depth/config";
 import MiniGame from "@/components/minigames/MiniGame";
+import { GameFeedback } from "@/types/minigames/common";
 
 function DepthGame() {
   const dispatch = useAppDispatch();
   const gameState = useAppSelector((state) => state.depthGame);
-  const [guessResult, setGuessResult] = useState<
-    "correct" | "incorrect" | undefined
-  >();
+  const [guessResult, setGuessResult] = useState<GameFeedback>("pending");
 
   useEffect(() => {
     if (gameState.isGameOver || gameState.speciesList !== undefined) return;
@@ -34,7 +33,7 @@ function DepthGame() {
       gameState.nextIdx === undefined ||
       gameState.speciesList === undefined ||
       gameState.isGameOver ||
-      guessResult !== undefined
+      guessResult !== "pending"
     ) {
       return;
     }
@@ -53,7 +52,7 @@ function DepthGame() {
 
     setTimeout(() => {
       dispatch(makeGuess(guess));
-      setGuessResult(undefined);
+      setGuessResult("pending");
     }, GAME_CONFIG.REVEAL_DELAY);
   };
 

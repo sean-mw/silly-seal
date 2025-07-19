@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAppDispatch } from "@/lib/hooks";
-import { revealCell, flagCell } from "@/store/cleanGameSlice";
+import { revealCell, flagCell, endGame } from "@/store/cleanGameSlice";
 import GuessFeedback from "../../ResultFeedback";
 import CellButton from "./CellButton";
 import { GAME_CONFIG } from "@/lib/minigames/clean/config";
 import { CleanGameState } from "@/types/minigames/clean";
+import { CleanGameEngine } from "@/lib/minigames/clean/engine";
+import { GameFeedback } from "@/types/minigames/common";
 
 interface CellGridProps {
   gameState: CleanGameState;
@@ -15,33 +17,36 @@ interface CellGridProps {
 function CellGrid({ gameState }: CellGridProps) {
   const dispatch = useAppDispatch();
   const [showRocks, setShowRocks] = useState(false);
-  const [gameResult, setGameResult] = useState<
-    "correct" | "incorrect" | undefined
-  >(undefined);
+  const [gameResult, setGameResult] = useState<GameFeedback>("pending");
   const [shakeAnimation, setShakeAnimation] = useState(false);
 
-  useEffect(() => {
-    if (gameState.isGameOver) {
-      if (gameState.reward > 0) {
-        setGameResult("correct");
-      } else {
-        setGameResult("incorrect");
+  const triggerEndGame = useCallback(
+    (result: GameFeedback) => {
+      setGameResult(result);
+      if (result === "incorrect") {
         setShakeAnimation(true);
         setShowRocks(true);
       }
-
-      const timeout = setTimeout(() => {
-        setGameResult(undefined);
-        setShakeAnimation(false);
-        setShowRocks(false);
+      setTimeout(() => {
+        dispatch(endGame("correct"));
       }, 1500);
+    },
+    [dispatch]
+  );
 
-      return () => clearTimeout(timeout);
+  useEffect(() => {
+    if (gameState.isGameOver || gameResult !== "pending") return;
+    if (CleanGameEngine.isCleared(gameState.grid)) {
+      triggerEndGame("correct");
     }
-  }, [gameState.isGameOver, gameState.reward]);
+  }, [gameResult, gameState.grid, gameState.isGameOver, triggerEndGame]);
 
   const handleLeftClick = (x: number, y: number) => {
-    dispatch(revealCell({ x, y }));
+    if (gameState.grid[y][x].hasRock) {
+      triggerEndGame("incorrect");
+    } else {
+      dispatch(revealCell({ x, y }));
+    }
   };
 
   const handleRightClick = (
