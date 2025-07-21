@@ -1,3 +1,4 @@
+import { ModalProps } from "@/components/Modal";
 import { SealStat } from "@/store/sealSlice";
 
 export interface GameState {
@@ -13,5 +14,7 @@ export interface MiniGameConfig {
   description: string;
   allowRestart: boolean;
 }
+
+export type GameModalProps = Omit<ModalProps, "title" | "storageKey">;
 
 export type GameFeedback = "correct" | "incorrect" | "pending";

@@ -11,7 +11,7 @@ function Button({ onClick, children, className, disabled }: ButtonProps) {
   return (
     <button
       className={cn(
-        "bg-black text-white rounded w-20 h-10 disabled:opacity-50",
+        "bg-black text-white rounded w-20 h-10 disabled:opacity-50 flex items-center justify-center",
         className
       )}
       disabled={disabled}

@@ -1,6 +1,7 @@
 import React from "react";
 import Button from "@/components/Button";
 import { Species } from "@/types/minigames/depth";
+import { ArrowDown, ArrowUp } from "lucide-react";
 
 interface SpeciesCardProps {
   species: Species;
@@ -44,14 +45,20 @@ export default function SpeciesCard({
               onClick={() => onGuess?.("higher")}
               disabled={disabled}
             >
-              Shallower
+              <span className="flex flex-row gap-2">
+                <ArrowUp />
+                Shallower
+              </span>
             </Button>
             <Button
               className="flex-1 bg-black/80 text-white hover:bg-black/100"
               onClick={() => onGuess?.("lower")}
               disabled={disabled}
             >
-              Deeper
+              <span className="flex flex-row gap-2">
+                <ArrowDown />
+                Deeper
+              </span>
             </Button>
           </div>
         )}

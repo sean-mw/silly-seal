@@ -11,9 +11,10 @@ import {
 import { DepthGameEngine } from "@/lib/minigames/depth/engine";
 import GameContent from "@/components/minigames/depth/GameContent";
 import { GAME_CONFIG } from "@/lib/minigames/depth/config";
-import MiniGame from "@/components/minigames/MiniGame";
+import MiniGame from "@/components/MiniGame";
 import { GameFeedback } from "@/types/minigames/common";
 import { usePreloadImages } from "@/hooks/usePreloadImages";
+import DepthModal from "@/components/minigames/depth/DepthModal";
 
 function DepthGame() {
   const dispatch = useAppDispatch();
@@ -75,6 +76,7 @@ function DepthGame() {
       gameState={gameState}
       onReset={() => dispatch(resetGame())}
       onReward={() => dispatch(markRewardApplied())}
+      Modal={DepthModal}
     >
       <GameContent
         gameState={gameState}

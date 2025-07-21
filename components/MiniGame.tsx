@@ -1,9 +1,13 @@
 "use client";
 
-import React, { ReactNode, useEffect, useRef } from "react";
+import { FC, ReactNode, useEffect, useRef, useState } from "react";
 import Button from "@/components/Button";
 import StatusBar from "@/components/StatusBar";
-import { GameState, MiniGameConfig } from "@/types/minigames/common";
+import {
+  GameModalProps,
+  GameState,
+  MiniGameConfig,
+} from "@/types/minigames/common";
 import { useCountdownToMidnight } from "@/hooks/useMidnightCountdown";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { applyReward } from "@/store/sealSlice";
@@ -12,6 +16,7 @@ import { useDailyReset } from "@/hooks/useDailyReset";
 interface MiniGameProps {
   config: MiniGameConfig;
   gameState: GameState;
+  Modal: FC<GameModalProps>;
   onReward: () => void;
   onReset: () => void;
   children: ReactNode;
@@ -28,6 +33,7 @@ function formatCountdown(ms: number) {
 function MiniGame({
   config,
   gameState,
+  Modal,
   onReward,
   onReset,
   children,
@@ -37,6 +43,7 @@ function MiniGame({
   const sealState = useAppSelector((state) => state.seal);
   const dispatch = useAppDispatch();
   const prevStatValueRef = useRef<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(true);
 
   useEffect(() => {
     if (!gameState.isGameOver || gameState.rewardApplied) return;
@@ -55,9 +62,14 @@ function MiniGame({
 
   return (
     <div className="flex flex-col w-full h-full items-center justify-center gap-4">
-      {!gameState.isGameOver && children}
+      {!gameState.isGameOver && (
+        <>
+          <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+          {children}
+        </>
+      )}
       {gameState.isGameOver && countdown && (
-        <div className="flex flex-col gap-4 text-center items-center w-full max-w-md">
+        <div className="flex flex-col gap-4 text-center items-center w-full">
           <div className="text-lg font-semibold">Game Over!</div>
           {gameState.isGameOver && (
             <div className="w-full">

@@ -6,9 +6,6 @@ interface LivesProps {
 }
 
 function Lives({ remainingLives, maxLives }: LivesProps) {
-  console.log(
-    `Rendering Lives: remainingLives=${remainingLives}, maxLives=${maxLives}`
-  );
   return (
     <div
       className={"flex items-center gap-2"}

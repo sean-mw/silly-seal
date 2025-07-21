@@ -12,10 +12,11 @@ import {
   markRewardApplied,
 } from "@/store/feedGameSlice";
 import { FeedGameEngine } from "@/lib/minigames/feed/engine";
-import MiniGame from "@/components/minigames/MiniGame";
+import MiniGame from "@/components/MiniGame";
 import GameGrid from "@/components/minigames/feed/GameGrid";
 import GameControls from "@/components/minigames/feed/GameControls";
 import { GAME_CONFIG } from "@/lib/minigames/feed/config";
+import FeedModal from "@/components/minigames/feed/FeedModal";
 
 function FeedGame() {
   const dispatch = useAppDispatch();
@@ -89,6 +90,7 @@ function FeedGame() {
       gameState={gameState}
       onReset={() => dispatch(resetGame())}
       onReward={() => dispatch(markRewardApplied())}
+      Modal={FeedModal}
     >
       <GameGrid
         guesses={gameState.guesses}

@@ -1,7 +1,8 @@
 "use client";
 
 import CellGrid from "@/components/minigames/clean/CellGrid";
-import MiniGame from "@/components/minigames/MiniGame";
+import CleanModal from "@/components/minigames/clean/CleanModal";
+import MiniGame from "@/components/MiniGame";
 import GuessFeedback from "@/components/ResultFeedback";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { CleanGameEngine } from "@/lib/minigames/clean/engine";
@@ -76,6 +77,7 @@ function CleanGame() {
       gameState={gameState}
       onReset={() => dispatch(resetGame())}
       onReward={() => dispatch(markRewardApplied())}
+      Modal={CleanModal}
     >
       <div className="flex flex-col h-full items-center justify-center gap-4">
         <GuessFeedback result={gameResult} />
