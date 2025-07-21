@@ -70,7 +70,6 @@ function DepthGame() {
         name: "Depth Guesser",
         description:
           "Guess whether the next species lives at a shallower or deeper depth!",
-        allowRestart: true,
         stat: "happiness",
       }}
       gameState={gameState}

@@ -84,7 +84,6 @@ function FeedGame() {
       config={{
         name: "Feed Mini-Game",
         description: "Feed the seal by guessing the correct sequence of fish!",
-        allowRestart: true,
         stat: "hunger",
       }}
       gameState={gameState}

@@ -72,7 +72,6 @@ function CleanGame() {
         name: "Clean the Seal",
         stat: "cleanliness",
         description: "Clean the seal enclosure while avoiding rocks!",
-        allowRestart: true,
       }}
       gameState={gameState}
       onReset={() => dispatch(resetGame())}

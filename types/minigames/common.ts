@@ -12,7 +12,6 @@ export interface MiniGameConfig {
   name: string;
   stat: SealStat;
   description: string;
-  allowRestart: boolean;
 }
 
 export type GameModalProps = Omit<ModalProps, "title" | "storageKey">;

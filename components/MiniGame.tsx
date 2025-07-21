@@ -86,7 +86,7 @@ function MiniGame({
           )}
           <div className="text-sm">You can play again in:</div>
           <div className="text-xl font-mono">{formatCountdown(countdown)}</div>
-          {config.allowRestart !== false && (
+          {process.env.NODE_ENV === "development" && (
             <Button onClick={onReset}>Restart</Button>
           )}
         </div>
